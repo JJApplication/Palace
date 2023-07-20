@@ -70,7 +70,7 @@ function Gallery() {
                   plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
               />
               <p>
-                You know I miss you so much...
+                Like more, Love more.
               </p>
               <p style={{fontSize: '1.2rem'}}>
                 Copyright <a href="https://renj.io">renj.io</a>
