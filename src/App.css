@@ -6,7 +6,7 @@
 #root {
   height: 100%;
   width: 100%;
-  max-width: 1280px;
+  max-width: 1440px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
@@ -50,6 +50,24 @@
 
 .react-photo-album img {
   aspect-ratio: auto !important;
-  border-radius: 0.55rem !important;
+  border-radius: 0.35rem !important;
   cursor: pointer;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+#monitor-group {
+  padding: 2rem 1rem;
+}
+
+#monitor-group button {
+  margin: 1rem;
+}
+
+#monitor-code {
+  padding: 1rem;
+}
+
+#monitor-code button {
+  border-radius: 0;
+  border: 1px solid #61dafb;
 }

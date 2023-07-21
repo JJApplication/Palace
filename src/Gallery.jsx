@@ -34,10 +34,32 @@ function Gallery() {
   const getPhotos = () => {
     fetch("/photos.json").then(r => {
       r.json().then(res => {
-        console.log(res)
-        setPhotos(res);
+        lazyLoadPhotos(res);
       })
     })
+  }
+
+  const lazyLoadPhotos = (list) => {
+    let sliceAll = list.length;
+    let slice = 0;
+    let lazy = setInterval(() => {
+      if (slice >= sliceAll) {
+        clearInterval(lazy);
+        return;
+      }
+
+      // 每次加载5张
+      for (let i=0; i<5; i++) {
+        slice++
+        if (slice >= sliceAll) {
+          setPhotos(list.slice(0, slice));
+          clearInterval(lazy);
+          return;
+        }
+      }
+
+      setPhotos(list.slice(0, slice));
+    }, 200);
   }
 
   return(
@@ -47,8 +69,8 @@ function Gallery() {
             <div style={{height: '100%', width: '100%'}}>
               <PhotoAlbum
                   breakpoints={[300, 600, 800, 1200]}
-                  padding={4}
-                  spacing={4}
+                  padding={20}
+                  spacing={15}
                   columns={(containerWidth) => {
                     if (containerWidth < 400) return 2;
                     if (containerWidth < 800) return 3;

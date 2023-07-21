@@ -1,16 +1,18 @@
 import { useState } from 'react'
-import './App.css'
-import './font.css'
 import Home from "./Home.jsx";
 import Gallery from "./Gallery.jsx";
+import Monitor from "./Monitor.jsx";
+import './App.css'
+import './font.css'
 
 function App() {
-  const [show, setShow] = useState(false);
+  const [show, setShow] = useState('home');
 
   return (
     <>
-      {!show && <Home setShow={setShow}/>}
-      {show && <Gallery />}
+      {show === 'home' && <Home setShow={setShow} />}
+      {show === 'gallery' && <Gallery />}
+      {show === 'monitor' && <Monitor setShow={setShow} />}
     </>
   )
 }
