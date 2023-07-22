@@ -21,10 +21,6 @@ function Gallery() {
   useEffect(() => {
     getPhotos();
     initCallback(initCode);
-    setTimeout(() => {
-      setInit(true);
-    }, 3000);
-
     return () => clearInterval(tick);
   }, []);
 
@@ -32,9 +28,24 @@ function Gallery() {
     getLightboxList();
   }, [photos])
 
+  const isInit = () => {
+    const rows = document.getElementsByClassName("react-photo-album react-photo-album--rows");
+    if (rows) {
+      const rowsChildren = rows[0].children;
+      if (rowsChildren && rowsChildren.length > 0) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   const initCallback = () => {
     tick = setInterval(() => {
       setInitCode(initCode => initCode === '#' ? '$' : '#');
+      if (isInit()) {
+        setInit(true);
+      }
     }, 200);
   }
 
