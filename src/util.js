@@ -18,7 +18,7 @@ export function clearPalaceCode() {
 
 export function fmtUrl(url, code) {
   if (DEV) {
-    return `http://gallery.renj.io${url}?palaceCode=${code}`;
+    return `http://127.0.0.1:12345${url}?palaceCode=${code}`;
   }
   return `${url}?palaceCode=${code}`;
 }

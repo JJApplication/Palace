@@ -10,6 +10,7 @@ package main
 import (
 	"fmt"
 	"github.com/JJApplication/fushin/server/http"
+	"os"
 	"path/filepath"
 )
 
@@ -46,12 +47,29 @@ func uploadImages(c *http.Context) {
 	return
 }
 
-func deleteImages(c *http.Context) {
+type deleteModel struct {
+	DeleteId   int    `json:"deleteId"`
+	DeleteName string `json:"deleteName"`
+}
 
+func deleteImages(c *http.Context) {
+	var body deleteModel
+	err := c.BindJSON(&body)
+	if err != nil {
+		c.ResponseStr(500, "")
+		return
+	}
+	fmt.Printf("delete photo: [%d] [%s]\n", body.DeleteId, body.DeleteName)
+	realImagePath := filepath.Join(".", body.DeleteName)
+	err = os.Remove(realImagePath)
+	fmt.Println(realImagePath, err.Error())
+	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
+	c.ResponseStr(200, "")
+	return
 }
 
 func generateImages(c *http.Context) {
-	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, UploadSize)
+	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
 	c.ResponseStr(200, "")
 	return
 }

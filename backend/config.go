@@ -12,13 +12,15 @@ import "github.com/JJApplication/fushin/utils/env"
 // 初始化配置
 
 var (
-	Host         string
-	Port         int
-	UploadPath   string
-	UploadSize   int
-	UploadPrefix string
-	PhotoOutput  string
-	PalaceCode   string
+	Host            string
+	Port            int
+	UploadPath      string
+	UploadSize      int
+	UploadPrefix    string
+	PhotoOutput     string
+	PalaceCode      string
+	ThumbnailPath   string
+	ThumbnailPrefix string
 )
 
 const (
@@ -36,4 +38,6 @@ func initConfig() {
 	UploadPrefix = loader.Get("UploadPrefix").MustString(DefaultPrefix)
 	PhotoOutput = loader.Get("PhotoOutput").MustString(DefaultOutput)
 	PalaceCode = loader.Get("PalaceCode").MustString(DefaultCode)
+	ThumbnailPath = loader.Get("ThumbnailPath").MustString(DefaultThumbnailPath)
+	ThumbnailPrefix = loader.Get("ThumbnailPrefix").MustString(DefaultThumbnail)
 }

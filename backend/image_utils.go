@@ -21,26 +21,29 @@ import (
 )
 
 const (
-	DefaultPath   = "images"
-	DefaultSize   = 1024
-	DefaultOutput = "photos.json"
-	DefaultPrefix = "/images"
+	DefaultPath          = "images"
+	DefaultThumbnailPath = "thumbnails"
+	DefaultSize          = 1024
+	DefaultOutput        = "photos.json"
+	DefaultPrefix        = "/images"
+	DefaultThumbnail     = "/thumbnails"
 )
 
 type Photo struct {
-	Src    string `json:"src"`
-	Height int    `json:"height"`
-	Width  int    `json:"width"`
+	Thumbnail string `json:"thumbnail"`
+	Image     string `json:"image"`
+	Height    int    `json:"height"`
+	Width     int    `json:"width"`
 }
 
-func generatePhotoJSON(imgPath, output, prefix string, imgMax int) {
+func generatePhotoJSON(imgPath, output, prefix, thumb string, imgMax int) {
 	fmt.Println("Palace Image Tools")
 	fmt.Println("====================")
 	fmt.Printf("image path: %s\nimage size: %d\noutput: %s\n",
 		imgPath, imgMax, output)
 
 	imgList := getImgList(imgPath)
-	photos := generateImagesList(imgPath, imgList, imgMax, prefix)
+	photos := generateImagesList(imgPath, imgList, imgMax, prefix, thumb)
 	data, err := json.MarshalIndent(photos, "", "  ")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -101,15 +104,16 @@ func addPrefix(s string, prefix string) string {
 	return fmt.Sprintf("%s/%s", prefix, s)
 }
 
-func generateImagesList(imgPath string, list []string, imgMax int, prefix string) []Photo {
+func generateImagesList(imgPath string, list []string, imgMax int, prefix, thumbnail string) []Photo {
 	var phs []Photo
 	for _, f := range list {
 		h, w, e := getImageSize(filepath.Join(imgPath, f), imgMax)
 		if e == nil {
 			phs = append(phs, Photo{
-				Src:    addPrefix(f, prefix),
-				Height: h,
-				Width:  w,
+				Thumbnail: addPrefix(f, thumbnail),
+				Image:     addPrefix(f, prefix),
+				Height:    h,
+				Width:     w,
 			})
 		} else {
 			fmt.Printf("convert [%s] error: %s\n", f, e.Error())

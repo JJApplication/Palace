@@ -7,3 +7,5 @@ export UploadSize=
 export UploadPrefix=
 export PhotoOutput=
 export PalaceCode=
+export ThumbnailPath=
+export ThumbnailPrefix=

@@ -7,10 +7,13 @@ import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+import {fmtUrl, getPalaceCode} from "./util.js";
 
 function Gallery() {
   const [index, setIndex] = useState(-1);
+  const [viewIndex, setViewIndex] = useState(-1);
   const [photos, setPhotos] = useState([]);
+  const [LightboxPhotos, setLightboxPhotos] = useState([]);
   const [init, setInit] = useState(false);
   const [initCode, setInitCode] = useState('#')
   let tick = null;
@@ -24,6 +27,10 @@ function Gallery() {
 
     return () => clearInterval(tick);
   }, []);
+
+  useEffect(() => {
+    getLightboxList();
+  }, [photos])
 
   const initCallback = () => {
     tick = setInterval(() => {
@@ -52,21 +59,52 @@ function Gallery() {
       for (let i=0; i<5; i++) {
         slice++
         if (slice >= sliceAll) {
-          setPhotos(list.slice(0, slice));
+          const photosList = list.slice(0, slice).map(p => {
+            return {
+              image: p.image,
+              src: p.thumbnail,
+              width: p.width || 0,
+              height: p.height || 0,
+            }
+          })
+          setPhotos(photosList);
           clearInterval(lazy);
           return;
         }
       }
 
-      setPhotos(list.slice(0, slice));
     }, 200);
+  }
+
+  const getLightboxList = () => {
+    setLightboxPhotos(photos.map(p => {
+      return {src: p.image}
+    }));
+  }
+
+  const deletePhoto = (index) => {
+    console.log('delete photo:', index);
+    fetch(fmtUrl('/api/delete', getPalaceCode()), {
+      method: 'post',
+      mode: 'cors',
+      cache: 'no-cache',
+      body: JSON.stringify({deleteId: index, deleteName: photos[index].image})
+    }).then(res => {
+      if (res.status === 200) {
+        alert('DELETE success');
+        getPhotos();
+      }
+    }).catch(() => alert('DELETE failed'))
   }
 
   return(
       <>
-        { !init && <h1>Gallery initializing {initCode}</h1>  }
-        { init &&
-            <div style={{height: '100%', width: '100%'}}>
+        { !init &&
+            <div style={{zIndex: 99999, position: 'fixed', top: 0,left: 0, backgroundColor: '#242424', height: '100%', width: '100%'}}>
+              <h1 style={{marginTop: '50vh'}}>Gallery initializing {initCode}</h1>
+            </div>
+        }
+            <div style={{height: '100%', width: '100%', maxWidth:  '1440px', margin: '0 auto'}}>
               <PhotoAlbum
                   breakpoints={[300, 600, 800, 1200]}
                   padding={20}
@@ -84,12 +122,21 @@ function Gallery() {
               />
 
               <Lightbox
-                  slides={photos}
+                  slides={LightboxPhotos}
                   open={index >= 0}
                   index={index}
-                  close={() => setIndex(-1)}
+                  close={() => { setIndex(-1); setViewIndex(-1) } }
                   // enable optional lightbox plugins
-                  plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
+                  plugins={[Fullscreen, Thumbnails, Zoom]}
+                  on={{ view: (e) => setViewIndex(e.index)}}
+                  toolbar={{
+                    buttons: [
+                      <button key="delete-button" type="button" className="yarl__button" onClick={() => deletePhoto(viewIndex)}>
+                        DELETE
+                      </button>,
+                      "close",
+                    ],
+                  }}
               />
               <p>
                 Like more & Love more
@@ -98,7 +145,6 @@ function Gallery() {
                 Copyright <a href="https://renj.io">renj.io</a>
               </p>
             </div>
-        }
       </>
   )
 }
