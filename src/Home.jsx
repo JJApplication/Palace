@@ -1,7 +1,5 @@
-import viteLogo from '/vite.svg'
-import reactLogo from "./assets/react.svg";
+import entrance from "./assets/entrance.jpg";
 import {useEffect, useState} from "react";
-import {fmtUrl} from "./util.js";
 
 function Home(props) {
   const [count, setCount] = useState(0)
@@ -21,10 +19,7 @@ function Home(props) {
       <>
         <div>
           <span onClick={() => props.setShow('monitor')}>
-            <img src={viteLogo} className="logo" alt="Vite logo" />
-          </span>
-          <span onClick={() => props.setShow('monitor')}>
-            <img src={reactLogo} className="logo react" alt="React logo" />
+            <img src={entrance} className="logo" alt="React logo" />
           </span>
         </div>
         <h1>Gallery with <span style={{fontSize: '2rem'}}>(Vite + React)</span></h1>
@@ -37,7 +32,7 @@ function Home(props) {
           </p>
         </div>
         <p className="read-the-docs">
-          Get source code on <a>github</a>
+          Get source code on <a href="https://github.com/JJApplication/Palace">github</a>
         </p>
       </>
   )

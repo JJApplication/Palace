@@ -1,8 +1,8 @@
 import {useRef, useState} from "react";
-import {clearPalaceCode, fmtUrl, savePalaceCode} from "./util.js";
+import {clearPalaceCode, fmtUrl, getPalaceCode, savePalaceCode} from "./util.js";
 
 function Monitor(props) {
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(getPalaceCode());
   const [start, setStart] = useState(0); // 0 init 1 start 2 done 3 failed
   const [check, setCheck] = useState(false);
 

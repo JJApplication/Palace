@@ -13,8 +13,10 @@
 }
 
 .logo {
-  height: 6em;
-  padding: 1.5em;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 12em;
+  padding: 1em;
   will-change: filter;
   transition: filter 300ms;
 }

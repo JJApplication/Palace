@@ -5,7 +5,7 @@ const DEV = false;
 export function getPalaceCode() {
   const code = localStorage.getItem(PalaceCodeName);
 
-  return code;
+  return code || '';
 }
 
 export function savePalaceCode(code) {

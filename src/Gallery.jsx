@@ -20,7 +20,7 @@ function Gallery() {
     initCallback(initCode);
     setTimeout(() => {
       setInit(true);
-    }, 3500);
+    }, 3000);
 
     return () => clearInterval(tick);
   }, []);
@@ -28,7 +28,7 @@ function Gallery() {
   const initCallback = () => {
     tick = setInterval(() => {
       setInitCode(initCode => initCode === '#' ? '$' : '#');
-    }, 250);
+    }, 200);
   }
 
   const getPhotos = () => {
@@ -92,7 +92,7 @@ function Gallery() {
                   plugins={[Fullscreen, Slideshow, Thumbnails, Zoom]}
               />
               <p>
-                Like more, Love more.
+                Like more & Love more
               </p>
               <p style={{fontSize: '1.2rem'}}>
                 Copyright <a href="https://renj.io">renj.io</a>
