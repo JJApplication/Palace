@@ -32,7 +32,7 @@ function Gallery() {
   }
 
   const getPhotos = () => {
-    fetch("/photos.json").then(r => {
+    fetch("/photos.json", {cache: 'no-cache'}).then(r => {
       r.json().then(res => {
         lazyLoadPhotos(res);
       })

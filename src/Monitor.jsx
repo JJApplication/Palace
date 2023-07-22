@@ -41,7 +41,7 @@ function Monitor(props) {
     for (let file of files) {
       formData.append('files', file);
     }
-    fetch(`http://127.0.0.1:12345/api/upload?palaceCode=${code}`, {
+    fetch(fmtUrl('/api/upload', code), {
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',

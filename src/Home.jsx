@@ -6,7 +6,7 @@ import {fmtUrl} from "./util.js";
 function Home(props) {
   const [count, setCount] = useState(0)
   const getPhotosCount = () => {
-    fetch("/photos.json").then(r => {
+    fetch("/photos.json", {cache: 'no-cache'}).then(r => {
       r.json().then(res => {
         setCount(res.length || 0);
       })
