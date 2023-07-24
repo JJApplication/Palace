@@ -7,6 +7,8 @@ import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {fmtUrl, getPalaceCode} from "./util.js";
 
 function Gallery() {
@@ -15,7 +17,8 @@ function Gallery() {
   const [photos, setPhotos] = useState([]);
   const [LightboxPhotos, setLightboxPhotos] = useState([]);
   const [init, setInit] = useState(false);
-  const [initCode, setInitCode] = useState('#')
+  const [initCode, setInitCode] = useState('#');
+
   let tick = null;
 
   useEffect(() => {
@@ -44,6 +47,7 @@ function Gallery() {
     tick = setInterval(() => {
       setInitCode(initCode => initCode === '#' ? '$' : '#');
       if (isInit()) {
+        clearInterval(tick);
         setInit(true);
       }
     }, 200);
@@ -102,10 +106,40 @@ function Gallery() {
       body: JSON.stringify({deleteId: index, deleteName: photos[index].image})
     }).then(res => {
       if (res.status === 200) {
-        alert('DELETE success');
-        getPhotos();
+        toast('delete success',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
+      } else {
+        toast('delete failed',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
-    }).catch(() => alert('DELETE failed'))
+    }).catch(() => {
+      toast('delete failed',{
+        position: "top-center",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: false,
+        draggable: true,
+        progress: undefined,
+        theme: "light",
+      });
+    })
   }
 
   return(

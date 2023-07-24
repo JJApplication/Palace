@@ -72,3 +72,16 @@
   border-radius: 0;
   border: 1px solid #61dafb;
 }
+
+.message-box {
+  position: fixed;
+  z-index: 10000;
+  margin: 0 auto;
+  width: 20rem;
+  height: auto;
+  top: 40%;
+  left: calc(50% - 10rem);
+  background-color: #1a1a1a;
+  border-radius: 1rem;
+  padding: 1rem 2rem;
+}

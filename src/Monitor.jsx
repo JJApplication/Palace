@@ -1,4 +1,6 @@
 import {useRef, useState} from "react";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {clearPalaceCode, fmtUrl, getPalaceCode, savePalaceCode} from "./util.js";
 
 function Monitor(props) {
@@ -49,6 +51,16 @@ function Monitor(props) {
     }).then(response => response.text())
         .then((data) => {
           setStart(2);
+          toast('upload success',{
+            position: "top-center",
+            autoClose: 3000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: false,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
         }).catch((e) => {
           if (e) {
             setStart(3);
@@ -77,9 +89,27 @@ function Monitor(props) {
       cache: 'no-cache',
     }).then(res => {
       if (res.status === 200) {
-        alert('task send');
+        toast('generate success', {
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       } else {
-        alert('task failed');
+        toast('generate failed',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
     })
   }
@@ -91,9 +121,27 @@ function Monitor(props) {
       cache: 'no-cache',
     }).then(res => {
       if (res.status === 200) {
-        alert('task send');
+        toast('rename success',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       } else {
-        alert('task failed');
+        toast('rename failed',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
     })
   }
@@ -105,9 +153,27 @@ function Monitor(props) {
       cache: 'no-cache',
     }).then(res => {
       if (res.status === 200) {
-        alert('task send');
+        toast('resize success',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       } else {
-        alert('task failed');
+        toast('resize failed',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
     })
   }
@@ -119,9 +185,27 @@ function Monitor(props) {
       cache: 'no-cache',
     }).then(res => {
       if (res.status === 200) {
-        alert('task send');
+        toast('convert success',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       } else {
-        alert('task failed');
+        toast('convert failed',{
+          position: "top-center",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: false,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+        });
       }
     })
   }

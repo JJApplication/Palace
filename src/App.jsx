@@ -4,6 +4,7 @@ import Gallery from "./Gallery.jsx";
 import Monitor from "./Monitor.jsx";
 import './App.css'
 import './font.css'
+import {ToastContainer} from "react-toastify";
 
 function App() {
   const [show, setShow] = useState('home');
@@ -13,6 +14,7 @@ function App() {
       {show === 'home' && <Home setShow={setShow} />}
       {show === 'gallery' && <Gallery />}
       {show === 'monitor' && <Monitor setShow={setShow} />}
+      <ToastContainer />
     </>
   )
 }

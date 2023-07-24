@@ -19,10 +19,10 @@ function Home(props) {
       <>
         <div>
           <span onClick={() => props.setShow('monitor')}>
-            <img src={entrance} className="logo" alt="React logo" />
+            <img src={entrance} className="logo" alt="logo" />
           </span>
         </div>
-        <h1>Gallery with <span style={{fontSize: '2rem'}}>(Vite + React)</span></h1>
+        <h1>Gallery with 💕</h1>
         <div className="card">
           <button onClick={() => props.setShow('gallery')}>
             Gallery photos {count}
