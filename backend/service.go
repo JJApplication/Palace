@@ -12,6 +12,7 @@ import (
 	"github.com/JJApplication/fushin/server/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // service
@@ -43,6 +44,9 @@ func uploadImages(c *http.Context) {
 		}
 	}
 
+	// compress & generate after upload
+	go taskCompress()
+	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
 	c.ResponseStr(200, "")
 	return
 }
@@ -62,7 +66,11 @@ func deleteImages(c *http.Context) {
 	fmt.Printf("delete photo: [%d] [%s]\n", body.DeleteId, body.DeleteName)
 	realImagePath := filepath.Join(".", body.DeleteName)
 	err = os.Remove(realImagePath)
-	fmt.Println(realImagePath, err.Error())
+	fmt.Println("remove image", realImagePath, err.Error())
+	// try to remove thumbnail
+	realThumbnailPath := filepath.Join(".", strings.ReplaceAll(body.DeleteName, UploadPrefix, ThumbnailPrefix))
+	err = os.Remove(realThumbnailPath)
+	fmt.Println("remove thumbnail", realThumbnailPath, err.Error())
 	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
 	c.ResponseStr(200, "")
 	return
