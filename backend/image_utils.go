@@ -8,9 +8,9 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"image"
+	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"io/fs"
@@ -34,27 +34,6 @@ type Photo struct {
 	Image     string `json:"image"`
 	Height    int    `json:"height"`
 	Width     int    `json:"width"`
-}
-
-func generatePhotoJSON(imgPath, output, prefix, thumb string, imgMax int) {
-	fmt.Println("Palace Image Tools")
-	fmt.Println("====================")
-	fmt.Printf("image path: %s\nimage size: %d\noutput: %s\n",
-		imgPath, imgMax, output)
-
-	imgList := getImgList(imgPath)
-	photos := generateImagesList(imgPath, imgList, imgMax, prefix, thumb)
-	data, err := json.MarshalIndent(photos, "", "  ")
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	err = os.WriteFile(output, data, 0644)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	fmt.Println("done")
 }
 
 func getImgList(p string) []string {
@@ -91,12 +70,16 @@ func getImageSize(file string, imgMax int) (height int, width int, err error) {
 	if err != nil {
 		return 0, 0, err
 	}
+
+	exifVal := getExif(file)
 	im, _, err := image.DecodeConfig(reader)
 	if err != nil {
 		return 0, 0, err
 	}
 
-	height, width = calcSize(im.Height, im.Width, imgMax)
+	fmt.Printf("EXIF: %d Height: %d Width: %d File: %s\n", exifVal, im.Height, im.Width, file)
+	EXHeight, EXWidth := getHWByExif(exifVal, im.Height, im.Width)
+	height, width = calcSize(EXHeight, EXWidth, imgMax)
 	return height, width, nil
 }
 
@@ -106,6 +89,7 @@ func addPrefix(s string, prefix string) string {
 
 func generateImagesList(imgPath string, list []string, imgMax int, prefix, thumbnail string) []Photo {
 	var phs []Photo
+	fmt.Printf("image list: %d\n", len(list))
 	for _, f := range list {
 		h, w, e := getImageSize(filepath.Join(imgPath, f), imgMax)
 		if e == nil {

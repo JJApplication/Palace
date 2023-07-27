@@ -12,7 +12,7 @@ function App() {
   return (
     <>
       {show === 'home' && <Home setShow={setShow} />}
-      {show === 'gallery' && <Gallery />}
+      {show === 'gallery' && <Gallery setShow={setShow} />}
       {show === 'monitor' && <Monitor setShow={setShow} />}
       <ToastContainer />
     </>

@@ -10,8 +10,9 @@ import "yet-another-react-lightbox/plugins/thumbnails.css";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import {fmtUrl, getPalaceCode} from "./util.js";
+import logo from './assets/logo.gif';
 
-function Gallery() {
+function Gallery(props) {
   const [index, setIndex] = useState(-1);
   const [viewIndex, setViewIndex] = useState(-1);
   const [photos, setPhotos] = useState([]);
@@ -30,6 +31,10 @@ function Gallery() {
   useEffect(() => {
     getLightboxList();
   }, [photos])
+
+  const backHome = () => {
+    props.setShow('home');
+  }
 
   const isInit = () => {
     const rows = document.getElementsByClassName("react-photo-album react-photo-album--rows");
@@ -150,10 +155,27 @@ function Gallery() {
             </div>
         }
             <div style={{height: '100%', width: '100%', maxWidth:  '1440px', margin: '0 auto'}}>
+              <div
+                  style={{ textAlign: 'left', marginBottom: '1.5rem', paddingBottom: '0.55rem', height: '50px', userSelect: 'none', borderBottom: '2px dashed #FFFFFF20' }}
+              >
+                <span
+                    style={{ fontSize: '2.75rem', cursor: 'pointer' }}
+                    onClick={backHome}
+                >
+                  Back
+                </span>
+                <img className="back-logo" src={logo} onClick={backHome} />
+                <span
+                    style={{ fontSize: '2.75rem', cursor: 'pointer' }}
+                    onClick={backHome}
+                >
+                  Home
+                </span>
+              </div>
               <PhotoAlbum
                   breakpoints={[300, 600, 800, 1200]}
                   padding={20}
-                  spacing={15}
+                  spacing={20}
                   columns={(containerWidth) => {
                     if (containerWidth < 400) return 2;
                     if (containerWidth < 800) return 3;
