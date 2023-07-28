@@ -9,13 +9,11 @@ package main
 
 import (
 	"fmt"
-	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
 	"io/fs"
 	"math"
-	"os"
 	"path/filepath"
 	"strconv"
 )
@@ -66,20 +64,10 @@ func calcSize(h, w int, imgMax int) (int, int) {
 }
 
 func getImageSize(file string, imgMax int) (height int, width int, err error) {
-	reader, err := os.Open(file)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	exifVal := getExif(file)
-	im, _, err := image.DecodeConfig(reader)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	fmt.Printf("EXIF: %d Height: %d Width: %d File: %s\n", exifVal, im.Height, im.Width, file)
-	EXHeight, EXWidth := getHWByExif(exifVal, im.Height, im.Width)
+	//EXHeight, EXWidth := getHWByExif(exifVal, im.Height, im.Width)
+	EXHeight, EXWidth := getImageSizeV2(file)
 	height, width = calcSize(EXHeight, EXWidth, imgMax)
+	fmt.Printf("Height: %d Width: %d File: %s\n", height, width, file)
 	return height, width, nil
 }
 

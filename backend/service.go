@@ -44,8 +44,7 @@ func uploadImages(c *http.Context) {
 		}
 	}
 
-	// compress & generate after upload
-	go taskCompress()
+	// generate after upload
 	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
 	c.ResponseStr(200, "")
 	return
@@ -60,17 +59,17 @@ func deleteImages(c *http.Context) {
 	var body deleteModel
 	err := c.BindJSON(&body)
 	if err != nil {
-		c.ResponseStr(500, "")
+		c.ResponseStr(500, err.Error())
 		return
 	}
 	fmt.Printf("delete photo: [%d] [%s]\n", body.DeleteId, body.DeleteName)
 	realImagePath := filepath.Join(".", body.DeleteName)
 	err = os.Remove(realImagePath)
-	fmt.Println("remove image", realImagePath, err.Error())
+	fmt.Println("remove image", realImagePath, err)
 	// try to remove thumbnail
 	realThumbnailPath := filepath.Join(".", strings.ReplaceAll(body.DeleteName, UploadPrefix, ThumbnailPrefix))
 	err = os.Remove(realThumbnailPath)
-	fmt.Println("remove thumbnail", realThumbnailPath, err.Error())
+	fmt.Println("remove thumbnail", realThumbnailPath, err)
 	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
 	c.ResponseStr(200, "")
 	return

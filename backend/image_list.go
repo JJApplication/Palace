@@ -16,6 +16,10 @@ import (
 // 生成最终的图片信息列表文件
 
 func generatePhotoJSON(imgPath, output, prefix, thumb string, imgMax int) {
+	if !canTaskRun(TaskGenerate) {
+		fmt.Printf("[%s] is running\n", TaskGenerate)
+		return
+	}
 	fmt.Println("Palace Image Tools")
 	fmt.Println("====================")
 	fmt.Printf("image path: %s\nimage size: %d\noutput: %s\n",

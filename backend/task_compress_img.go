@@ -21,8 +21,14 @@ const (
 )
 
 func taskCompress() {
+	if !canTaskRun(TaskCompress) {
+		fmt.Printf("[%s] is running\n", TaskCompress)
+		return
+	}
+	fmt.Printf("[%s] is start\n", TaskCompress)
 	err := cmd.Cmd.Exec(TaskCompressScript)
 	if err != nil {
 		fmt.Printf("Run task compress error: %s\n", err.Error())
 	}
+	taskSetDone(TaskCompress)
 }

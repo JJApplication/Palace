@@ -50,6 +50,20 @@ function Monitor(props) {
       body: formData,
     }).then(response => response.text())
         .then((data) => {
+          if (data !== "") {
+            setStart(3);
+            toast('upload failed' + data,{
+              position: "top-center",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: false,
+              draggable: true,
+              progress: undefined,
+              theme: "light",
+            });
+            return;
+          }
           setStart(2);
           toast('upload success',{
             position: "top-center",
@@ -254,7 +268,7 @@ function Monitor(props) {
         <input ref={ref}  type="file" onChange={e => startUpload(e)} multiple style={{display: 'none'}}/>
         <div id="monitor-code">
           <div
-              style={{cursor: 'pointer', userSelect: 'none', backgroundColor: '#7972d9', width: '6rem', margin: '0 auto', padding: '0.5rem'}}
+              className="auth-check"
               onClick={checkAuth}
           >auth check:
             {check && <span style={{fontSize: '1.25rem'}}>🥳</span>}

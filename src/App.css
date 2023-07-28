@@ -73,6 +73,22 @@
   border: 1px solid #61dafb;
 }
 
+.auth-check {
+  cursor: pointer;
+  user-select: none;
+  background-color: #7972d9;
+  width: 6rem;
+  margin: 0 auto;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+.auth-check:hover {
+  background-color: #b96a9c;
+  transition: background-color;
+  transition-duration: 150ms;
+  transition-timing-function: ease-in;
+}
+
 .message-box {
   position: fixed;
   z-index: 10000;

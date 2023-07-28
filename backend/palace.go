@@ -9,5 +9,6 @@ package main
 
 func main() {
 	initConfig()
+	initTaskMap()
 	Start()
 }
