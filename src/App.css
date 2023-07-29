@@ -109,3 +109,36 @@
   cursor: pointer;
   vertical-align: top;
 }
+
+.about {
+  position: fixed;
+  bottom: 1rem;
+  right: 2rem;
+  font-size: 2rem;
+  display: block;
+  cursor: pointer;
+  width: 3rem;
+  height: auto;
+  border-radius: 0.25rem;
+  background-color: #2F2F2F;
+  text-align: center;
+  vertical-align: center;
+}
+
+.about-content {
+  font-family: sans-serif !important;
+  position: fixed;
+  bottom: 1rem;
+  right: 6rem;
+  border-radius: 0.25rem;
+  background-color: #2F2F2F;
+  text-align: left;
+  padding: 1rem;
+  font-size: 0.9rem;
+  max-width: 400px;
+  word-break: break-all;
+}
+
+.about-content a {
+  font-size: 0.9rem;
+}
