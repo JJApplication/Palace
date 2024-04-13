@@ -104,7 +104,10 @@ function Gallery(props) {
 
   const deletePhoto = (index) => {
     console.log('delete photo:', index);
-    fetch(fmtUrl('/api/delete', getPalaceCode()), {
+    fetch(fmtUrl('/api/delete'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',

@@ -16,9 +16,9 @@ export function clearPalaceCode() {
   localStorage.clear();
 }
 
-export function fmtUrl(url, code) {
-  if (DEV) {
-    return `http://127.0.0.1:12345${url}?palaceCode=${code}`;
+export function fmtUrl(url) {
+  if (url.includes('..')) {
+    url = url.replaceAll('..', '')
   }
-  return `${url}?palaceCode=${code}`;
+  return url;
 }

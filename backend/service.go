@@ -18,7 +18,16 @@ import (
 // service
 func checkLogin(c *http.Context) {
 	code := c.Query("palaceCode")
-	fmt.Printf("palaceCode code: %s\n", code)
+	if code == "" {
+		fmt.Println("palaceCode code is empty")
+	}
+	code = c.GetHeader("token")
+	if code == "" {
+		fmt.Println("palaceCode token is empty")
+		c.AbortWithStatus(403)
+		return
+	}
+
 	if code != PalaceCode {
 		c.AbortWithStatus(403)
 		return

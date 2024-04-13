@@ -43,7 +43,10 @@ function Monitor(props) {
     for (let file of files) {
       formData.append('files', file);
     }
-    fetch(fmtUrl('/api/upload', code), {
+    fetch(fmtUrl('/api/upload'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',
@@ -83,7 +86,10 @@ function Monitor(props) {
   }
 
   const checkAuth = () => {
-    fetch(fmtUrl('/api/check', code), {
+    fetch(fmtUrl('/api/check'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',
@@ -97,7 +103,10 @@ function Monitor(props) {
   }
 
   const generateUpload = () => {
-    fetch(fmtUrl('/api/generate', code), {
+    fetch(fmtUrl('/api/generate'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',
@@ -129,7 +138,10 @@ function Monitor(props) {
   }
 
   const renamePhotos = () => {
-    fetch(fmtUrl('/api/rename', code), {
+    fetch(fmtUrl('/api/rename'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',
@@ -161,7 +173,10 @@ function Monitor(props) {
   }
 
   const resizePhotos = () => {
-    fetch(fmtUrl('/api/resize', code), {
+    fetch(fmtUrl('/api/resize'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',
@@ -193,7 +208,10 @@ function Monitor(props) {
   }
 
   const convertPhotos = () => {
-    fetch(fmtUrl('/api/convert', code), {
+    fetch(fmtUrl('/api/convert'), {
+      headers: {
+        token: getPalaceCode()
+      },
       method: 'post',
       mode: 'cors',
       cache: 'no-cache',
