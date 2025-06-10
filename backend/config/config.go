@@ -5,9 +5,11 @@
    Copyright Renj
 */
 
-package main
+package config
 
-import "github.com/JJApplication/fushin/utils/env"
+import (
+	"github.com/JJApplication/fushin/utils/env"
+)
 
 // 初始化配置
 
@@ -21,15 +23,30 @@ var (
 	PalaceCode      string
 	ThumbnailPath   string
 	ThumbnailPrefix string
+	DBPath          string
+	DBRetryTime     int
+	DBMaxRetry      int
 )
 
 const (
-	DefaultHost = "127.0.0.1"
-	DefaultPort = 12345
-	DefaultCode = "123456"
+	DefaultHost      = "127.0.0.1"
+	DefaultPort      = 12345
+	DefaultCode      = "123456"
+	DefaultDB        = "palace.db"
+	DefaultRetryTime = 5
+	DefaultMaxRetry  = 10
 )
 
-func initConfig() {
+const (
+	DefaultPath          = "images"
+	DefaultThumbnailPath = "thumbnails"
+	DefaultSize          = 1024
+	DefaultOutput        = "photos.json"
+	DefaultPrefix        = "/images"
+	DefaultThumbnail     = "/thumbnails"
+)
+
+func InitConfig() {
 	loader := env.EnvLoader{}
 	Host = loader.Get("Host").MustString(DefaultHost)
 	Port = loader.Get("Port").MustInt(DefaultPort)
@@ -40,4 +57,7 @@ func initConfig() {
 	PalaceCode = loader.Get("PalaceCode").MustString(DefaultCode)
 	ThumbnailPath = loader.Get("ThumbnailPath").MustString(DefaultThumbnailPath)
 	ThumbnailPrefix = loader.Get("ThumbnailPrefix").MustString(DefaultThumbnail)
+	DBPath = loader.Get("DBPath").MustString(DefaultDB)
+	DBRetryTime = loader.Get("DBRetryTime").MustInt(DefaultRetryTime)
+	DBMaxRetry = loader.Get("DBMaxRetry").MustInt(DefaultMaxRetry)
 }

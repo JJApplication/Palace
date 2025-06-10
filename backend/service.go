@@ -11,6 +11,7 @@ import (
 	"fmt"
 	"github.com/JJApplication/fushin/server/http"
 	"os"
+	"palace/config"
 	"path/filepath"
 	"strings"
 )
@@ -28,7 +29,7 @@ func checkLogin(c *http.Context) {
 		return
 	}
 
-	if code != PalaceCode {
+	if code != config.PalaceCode {
 		c.AbortWithStatus(403)
 		return
 	}
@@ -46,7 +47,7 @@ func uploadImages(c *http.Context) {
 
 	for index, file := range form.File["files"] {
 		fmt.Printf("process [%d] image: %s\n", index, file.Filename)
-		err = c.SaveUploadedFile(file, filepath.Join(UploadPath, file.Filename))
+		err = c.SaveUploadedFile(file, filepath.Join(config.UploadPath, file.Filename))
 		if err != nil {
 			fmt.Printf("process [%d] image %s error: %s\n", index, file.Filename, err.Error())
 			continue
@@ -54,7 +55,7 @@ func uploadImages(c *http.Context) {
 	}
 
 	// generate after upload
-	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
+	go generatePhotoJSON(config.UploadPath, config.PhotoOutput, config.UploadPrefix, config.ThumbnailPrefix, config.UploadSize)
 	c.ResponseStr(200, "")
 	return
 }
@@ -76,34 +77,34 @@ func deleteImages(c *http.Context) {
 	err = os.Remove(realImagePath)
 	fmt.Println("remove image", realImagePath, err)
 	// try to remove thumbnail
-	realThumbnailPath := filepath.Join(".", strings.ReplaceAll(body.DeleteName, UploadPrefix, ThumbnailPrefix))
+	realThumbnailPath := filepath.Join(".", strings.ReplaceAll(body.DeleteName, config.UploadPrefix, config.ThumbnailPrefix))
 	err = os.Remove(realThumbnailPath)
 	fmt.Println("remove thumbnail", realThumbnailPath, err)
-	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
+	go generatePhotoJSON(config.UploadPath, config.PhotoOutput, config.UploadPrefix, config.ThumbnailPrefix, config.UploadSize)
 	c.ResponseStr(200, "")
 	return
 }
 
 func generateImages(c *http.Context) {
-	go generatePhotoJSON(UploadPath, PhotoOutput, UploadPrefix, ThumbnailPrefix, UploadSize)
+	go generatePhotoJSON(config.UploadPath, config.PhotoOutput, config.UploadPrefix, config.ThumbnailPrefix, config.UploadSize)
 	c.ResponseStr(200, "")
 	return
 }
 
 func resizeImages(c *http.Context) {
-	go taskCompress()
+	//go taskCompress()
 	c.ResponseStr(200, "")
 	return
 }
 
 func convertImages(c *http.Context) {
-	go taskConvert()
+	//go taskConvert()
 	c.ResponseStr(200, "")
 	return
 }
 
 func renameImages(c *http.Context) {
-	go taskRename()
+	//go taskRename()
 	c.ResponseStr(200, "")
 	return
 }

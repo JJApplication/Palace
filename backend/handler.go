@@ -9,6 +9,7 @@ package main
 
 import (
 	"github.com/JJApplication/fushin/server/http"
+	"palace/config"
 )
 
 // web handler
@@ -18,8 +19,8 @@ func Start() {
 		EnableLog: true,
 		Debug:     false,
 		Address: http.Address{
-			Host: Host,
-			Port: Port,
+			Host: config.Host,
+			Port: config.Port,
 		},
 		Copyright: "renj.io",
 		PProf:     false,

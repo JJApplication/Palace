@@ -18,15 +18,6 @@ import (
 	"strconv"
 )
 
-const (
-	DefaultPath          = "images"
-	DefaultThumbnailPath = "thumbnails"
-	DefaultSize          = 1024
-	DefaultOutput        = "photos.json"
-	DefaultPrefix        = "/images"
-	DefaultThumbnail     = "/thumbnails"
-)
-
 type Photo struct {
 	Thumbnail string `json:"thumbnail"`
 	Image     string `json:"image"`

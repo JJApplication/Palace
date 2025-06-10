@@ -7,8 +7,18 @@
 
 package main
 
+import (
+	"palace/config"
+	"palace/db"
+	"palace/log"
+	"palace/task"
+)
+
 func main() {
-	initConfig()
+	config.InitConfig()
+	log.InitLogger()
+	db.InitDB()
+	task.InitTaskGroup()
 	initTaskMap()
 	Start()
 }
