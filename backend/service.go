@@ -16,27 +16,6 @@ import (
 	"strings"
 )
 
-// service
-func checkLogin(c *http.Context) {
-	code := c.Query("palaceCode")
-	if code == "" {
-		fmt.Println("palaceCode code is empty")
-	}
-	code = c.GetHeader("token")
-	if code == "" {
-		fmt.Println("palaceCode token is empty")
-		c.AbortWithStatus(403)
-		return
-	}
-
-	if code != config.PalaceCode {
-		c.AbortWithStatus(403)
-		return
-	}
-
-	c.Next()
-}
-
 func uploadImages(c *http.Context) {
 	form, err := c.MultipartForm()
 	if err != nil {

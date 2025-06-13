@@ -11,6 +11,7 @@ import (
 	"palace/config"
 	"palace/db"
 	"palace/log"
+	"palace/service"
 	"palace/task"
 )
 
@@ -19,6 +20,7 @@ func main() {
 	log.InitLogger()
 	db.InitDB()
 	task.InitTaskGroup()
+	service.InitService()
 	initTaskMap()
 	Start()
 }

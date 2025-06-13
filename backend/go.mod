@@ -23,6 +23,7 @@ require (
 	github.com/go-playground/validator/v10 v10.11.0 // indirect
 	github.com/goccy/go-json v0.9.7 // indirect
 	github.com/gomodule/redigo v1.8.9 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/gookit/color v1.5.1 // indirect
 	github.com/gookit/goutil v0.5.8 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect

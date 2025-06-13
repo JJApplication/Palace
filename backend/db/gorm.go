@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"palace/config"
+	"palace/model"
 	"time"
 
 	"gorm.io/driver/sqlite"
@@ -54,8 +55,19 @@ func InitDB() {
 			time.Sleep(time.Duration(retryInterval) * time.Second)
 		}
 	}
+	if db == nil {
+		pl.Logger.ErrorF("failed to connect to db %v\n", err)
+		return
+	}
 
-	err = db.AutoMigrate(&User{})
+	err = db.AutoMigrate(
+		&model.User{},
+		&model.Image{},
+		&model.Category{},
+		&model.Tag{},
+		&model.ImageCate{},
+		&model.ImageTag{},
+	)
 	if err != nil {
 		pl.Logger.ErrorF("failed to migrate db %v\n", err)
 	}

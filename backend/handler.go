@@ -30,6 +30,27 @@ func Start() {
 	server.RegMiddle(http.Wrapper{Name: "cors", WrapperFunc: http.MiddleWareCors()})
 	server.GetEngine().MaxMultipartMemory = 128 << 20
 
+	// 静态文件
+	fileGroup := server.Group("/static", AccessHidden)
+	{
+		fileGroup.Static("", config.UploadPath)
+	}
+	// 按逻辑分组
+	imageGroup := server.Group("/api/image")
+	{
+		imageGroup.Handle(http.POST, "/info")
+		imageGroup.Handle(http.POST, "/upload", CheckLogin)
+		imageGroup.Handle(http.POST, "/hidden")
+		imageGroup.Handle(http.POST, "/modify")
+		imageGroup.Handle(http.POST, "/delete")
+	}
+
+	taskGroup := server.Group("/api/task")
+	{
+		taskGroup.Handle(http.POST, "/generate") // 重新生成索引
+		taskGroup.Handle(http.POST, "/list")     // 任务列表
+	}
+
 	server.Route(http.POST, "/api/check", checkLogin)
 	server.Route(http.POST, "/api/upload", checkLogin, uploadImages)
 	server.Route(http.POST, "/api/delete", checkLogin, deleteImages)
