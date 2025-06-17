@@ -1,19 +1,18 @@
-import { useState } from 'react'
-import Home from "./Home.jsx";
-import Gallery from "./Gallery.jsx";
-import Monitor from "./Monitor.jsx";
 import './App.css'
 import './font.css'
+import router from './router/router.jsx'
 import {ToastContainer} from "react-toastify";
+import {ConfigProvider, theme} from "antd";
+import {RouterProvider} from "react-router";
 
 function App() {
-  const [show, setShow] = useState('home');
-
   return (
     <>
-      {show === 'home' && <Home setShow={setShow} />}
-      {show === 'gallery' && <Gallery setShow={setShow} />}
-      {show === 'monitor' && <Monitor setShow={setShow} />}
+      <ConfigProvider theme={{
+        algorithm: theme.darkAlgorithm
+      }}>
+        <RouterProvider router={router}></RouterProvider>
+      </ConfigProvider>
       <ToastContainer />
     </>
   )
