@@ -32,8 +32,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/monitor", // 管理员页面
-    Component: Monitor,
-    loader: AuthGuard,
+    Component: Monitor, // 无需认证允许访客查看
   },
   {
     path: "/monitor/image", // 管理图片

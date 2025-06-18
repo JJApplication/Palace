@@ -1,6 +1,6 @@
 import {fmtUrl, getPalaceCode} from "../util.js";
 
-const login = () => {
+const apiLogin = () => {
   return fetch(fmtUrl('/api/user/login'), {
     method: 'post',
     mode: 'cors',
@@ -8,7 +8,7 @@ const login = () => {
   })
 }
 
-const checkLogin = () => {
+const apiCheckLogin = () => {
   return fetch(fmtUrl('/api/user/check'), {
     headers: {
       token: getPalaceCode()
@@ -19,4 +19,15 @@ const checkLogin = () => {
   })
 }
 
-export { login, checkLogin }
+const apiLogout = () => {
+  return fetch(fmtUrl('/api/user/logout'), {
+    headers: {
+      token: getPalaceCode()
+    },
+    method: 'post',
+    mode: 'cors',
+    cache: 'no-cache',
+  })
+}
+
+export { apiLogin, apiCheckLogin, apiLogout }

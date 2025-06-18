@@ -1,6 +1,7 @@
 // 登录页 通过中间件拦截页面路由进入
 import {Button, Card, Form, Input, Space} from "antd";
 import {NavLink} from "react-router";
+import {LoginOutlined} from "@ant-design/icons";
 
 const Login = () => {
   const login = (e) => {
@@ -38,7 +39,7 @@ const Login = () => {
                   </NavLink>
                 </Form.Item>
                 <Form.Item label={null}>
-                  <Button type="primary" htmlType="submit">
+                  <Button type="primary" htmlType="submit" icon={<LoginOutlined />}>
                     Login
                   </Button>
                 </Form.Item>
