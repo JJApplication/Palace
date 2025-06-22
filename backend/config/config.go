@@ -26,15 +26,17 @@ var (
 	DBPath          string
 	DBRetryTime     int
 	DBMaxRetry      int
+	AESKey          string
 )
 
 const (
-	DefaultHost      = "127.0.0.1"
+	DefaultHost      = "0.0.0.0"
 	DefaultPort      = 12345
 	DefaultCode      = "123456"
 	DefaultDB        = "palace.db"
 	DefaultRetryTime = 5
 	DefaultMaxRetry  = 10
+	DefaultAESKey    = "PalacePalacePalacePalacePalaceXX"
 )
 
 const (
@@ -60,4 +62,5 @@ func InitConfig() {
 	DBPath = loader.Get("DBPath").MustString(DefaultDB)
 	DBRetryTime = loader.Get("DBRetryTime").MustInt(DefaultRetryTime)
 	DBMaxRetry = loader.Get("DBMaxRetry").MustInt(DefaultMaxRetry)
+	AESKey = loader.Get("AESKey").MustString(DefaultAESKey)
 }

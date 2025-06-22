@@ -20,7 +20,7 @@ func (s *TagService) Add(tag response.TagRes) error {
 	if err := s.validate(tag); err != nil {
 		return err
 	}
-	return db.DB.Model(&model.Tag{}).Create(model.Tag{
+	return db.DB.Model(&model.Tag{}).Create(&model.Tag{
 		Name:    tag.Name,
 		Like:    tag.Like,
 		TagDate: tag.TagDate,
@@ -44,9 +44,6 @@ func (s *TagService) Update(tag response.TagRes) error {
 }
 
 func (s *TagService) Delete(tag response.TagRes) error {
-	if err := s.validate(tag); err != nil {
-		return err
-	}
 	tx := db.DB.Begin()
 	if err := tx.Where("id=?", tag.ID).Delete(&model.Tag{}).Error; err != nil {
 		tx.Rollback()
@@ -68,17 +65,21 @@ func (s *TagService) Get(name string) response.TagRes {
 	if err := db.DB.Model(&model.Tag{}).Where("name=?", name).First(&tag).Error; err != nil {
 		return response.TagRes{}
 	}
-	return tag.ToResponse()
+	res := tag.ToResponse()
+	res.ImageCount = s.GetTagImageCount(tag.ID)
+	return res
 }
 
 func (s *TagService) GetList() []response.TagRes {
 	var tags []model.Tag
-	if err := db.DB.Model(&model.Tag{}).Find(&tags).Error; err != nil {
-		return nil
+	if err := db.DB.Model(&model.Tag{}).Order("create_at asc").Find(&tags).Error; err != nil {
+		return []response.TagRes{}
 	}
 	result := make([]response.TagRes, 0)
 	for _, tag := range tags {
-		result = append(result, tag.ToResponse())
+		res := tag.ToResponse()
+		res.ImageCount = s.GetTagImageCount(tag.ID)
+		result = append(result, res)
 	}
 	return result
 }
@@ -97,7 +98,7 @@ func (s *TagService) GetTagImages(tagName string) []response.ImageRes {
 		return nil
 	}
 	var images []model.Image
-	if err := db.DB.Model(&model.Image{}).Where("uuid IN ?", i2t).Find(&images).Error; err != nil {
+	if err := db.DB.Model(&model.Image{}).Where("uuid IN ?", i2t).Order("create_at asc").Find(&images).Error; err != nil {
 		return nil
 	}
 	result := make([]response.ImageRes, 0)
@@ -105,4 +106,13 @@ func (s *TagService) GetTagImages(tagName string) []response.ImageRes {
 		result = append(result, image.ToResponse())
 	}
 	return result
+}
+
+func (s *TagService) GetTagImageCount(tagId int) int64 {
+	if tagId < 0 {
+		return 0
+	}
+	var count int64
+	db.DB.Model(&model.ImageTag{}).Where("tag=?", tagId).Count(&count)
+	return count
 }

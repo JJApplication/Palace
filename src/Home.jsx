@@ -1,16 +1,23 @@
 import entrance from "./assets/entrance.jpg";
 import {useEffect, useState} from "react";
 import './styles/Home.css';
+import { useNavigate } from "react-router";
+import { apiGetImageCount } from "./api/images.js";
+import { toast } from "react-toastify";
 
-function Home(props) {
+function Home() {
+  const nav = useNavigate()
   const [count, setCount] = useState(0)
   const [openAbout, setOpenAbout] = useState(false);
 
   const getPhotosCount = () => {
-    fetch("/photos.json", {cache: 'no-cache'}).then(r => {
+    apiGetImageCount().then(r => {
       r.json().then(res => {
-        setCount(res.length || 0);
+        const data = res.data;
+        setCount(data || 0);
       })
+    }).catch(() => {
+      toast.error('获取图片数量失败')
     })
   }
 
@@ -22,13 +29,13 @@ function Home(props) {
       <>
         <div className={'home'}>
           <div>
-          <span onClick={() => props.setShow('monitor')}>
+          <span onClick={() => nav('/gallery')}>
             <img src={entrance} className="logo" alt="logo" />
           </span>
           </div>
           <h1>Gallery with 💕</h1>
           <div className="card">
-            <button onClick={() => props.setShow('gallery')}>
+            <button onClick={() => nav('/gallery')}>
               Gallery photos {count}
             </button>
             <p>

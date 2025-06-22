@@ -1,7 +1,14 @@
 package service
 
+import "github.com/gin-gonic/gin"
+
 // TaskService task服务 用于创建后台运行的异步任务
 type TaskService struct{}
+
+// ListTasks 列举任务列表
+func (s *TaskService) ListTasks(c *gin.Context) {
+
+}
 
 // CreateImagesIndex 重新索引全部图片 创建缩略图
 func (s *TaskService) CreateImagesIndex() {
@@ -30,5 +37,10 @@ func (s *TaskService) CreateImageThumbnail() {
 
 // ConvertImage 为新图片做格式转换
 func (s *TaskService) ConvertImage() {
+
+}
+
+// CleanImage 清理已经被物理删除的图片文件
+func (s *TaskService) CleanImage(c *gin.Context) {
 
 }

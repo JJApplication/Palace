@@ -5,4 +5,5 @@ var (
 	CategoryControllerApp = new(CategoryController)
 	TagControllerApp      = new(TagController)
 	TaskControllerApp     = new(TaskController)
+	UserControllerApp     = new(UserController)
 )

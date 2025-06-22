@@ -1,12 +1,13 @@
 package main
 
 import (
+	"strings"
+
 	"github.com/JJApplication/fushin/server/http"
 	"github.com/gin-gonic/gin"
 	"palace/config"
 	"palace/log"
 	"palace/service"
-	"strings"
 )
 
 /*
@@ -27,6 +28,7 @@ func AccessHidden(c *http.Context) {
 	}
 }
 
+// CheckLogin 前置校验中间件，权限对应编辑者，允许删除图片到回收站
 func CheckLogin(c *gin.Context) {
 	code := c.Query("palaceCode")
 	if code == "" {
@@ -39,10 +41,19 @@ func CheckLogin(c *gin.Context) {
 		return
 	}
 
-	if code != config.PalaceCode {
+	// 旧的认证机制
+	var valid bool
+	if code == config.PalaceCode {
+		c.Next()
+		return
+	}
+	if service.UserServiceApp.CheckUser(code) {
+		valid = true
+	}
+
+	if !valid {
 		c.AbortWithStatus(403)
 		return
 	}
-
 	c.Next()
 }

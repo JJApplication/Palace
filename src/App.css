@@ -1,6 +1,5 @@
 * {
   font-family: 'vt', sans-serif;
-  font-size: 1.05rem;
 }
 
 #root {
@@ -102,7 +101,7 @@
 }
 
 .back-logo {
-  width: 3.5rem;
+  width: 2.25rem;
   height: auto;
   padding: 0;
   cursor: pointer;

@@ -9,9 +9,10 @@ type Image struct {
 	Base
 	Name        string `json:"name" gorm:"column:name;not null"`
 	UUID        string `json:"uuid" gorm:"column:uuid;not null"`
+	Ext         string `json:"ext" gorm:"column:ext"`
 	Size        int64  `json:"size" gorm:"column:size"`
-	Width       int64  `json:"width" gorm:"column:width;not null"`
-	Height      int64  `json:"height" gorm:"column:height;not null"`
+	Width       int    `json:"width" gorm:"column:width;not null"`
+	Height      int    `json:"height" gorm:"column:height;not null"`
 	Like        int    `json:"like" gorm:"column:like"`
 	Description string `json:"description" gorm:"column:description;type:text"`
 	Thumbnail   string `json:"thumbnail" gorm:"column:thumbnail;type:text"`
@@ -33,6 +34,7 @@ func (i *Image) ToResponse() response.ImageRes {
 		},
 		Name:         i.Name,
 		UUID:         i.UUID,
+		Ext:          i.Ext,
 		Size:         i.Size,
 		Width:        i.Width,
 		Height:       i.Height,
@@ -41,5 +43,6 @@ func (i *Image) ToResponse() response.ImageRes {
 		Thumbnail:    i.Thumbnail,
 		NeedHide:     i.NeedHide,
 		NeedPassword: i.NeedPassword,
+		Password:     "",
 	}
 }

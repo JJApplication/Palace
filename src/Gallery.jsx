@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import PhotoAlbum from "react-photo-album";
+import { RowsPhotoAlbum } from "react-photo-album";
+import 'react-photo-album/rows.css';
 import Lightbox from "yet-another-react-lightbox";
 import "yet-another-react-lightbox/styles.css";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
@@ -7,13 +8,12 @@ import Slideshow from "yet-another-react-lightbox/plugins/slideshow";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
-import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { fmtUrl, getPalaceCode } from "./util.js";
 import logo from "./assets/logo.gif";
 import { useNavigate } from "react-router";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
+import { apiGetImageList } from "./api/images.js";
 
 function Gallery() {
   const nav = useNavigate();
@@ -27,14 +27,10 @@ function Gallery() {
   let tick = null;
 
   useEffect(() => {
-    getPhotos();
+    getPhotos()
     initCallback(initCode);
     return () => clearInterval(tick);
   }, []);
-
-  useEffect(() => {
-    getLightboxList();
-  }, [photos]);
 
   const backHome = () => {
     nav("/");
@@ -65,78 +61,32 @@ function Gallery() {
   };
 
   const getPhotos = () => {
-    fetch("/photos.json", { cache: "no-cache" }).then((r) => {
+    apiGetImageList().then((r) => {
       r.json().then((res) => {
-        lazyLoadPhotos(res);
+        const photosList = res.data.map((p) => {
+          return {
+            image: `/static/image/${p.uuid}${p.ext}`,
+            src: `/static/thumbnail/${p.thumbnail}`,
+            width: p.width,
+            height: p.height,
+          };
+        });
+        setPhotos(photosList);
+        getLightboxList(photosList);
       });
     });
   };
 
-  const lazyLoadPhotos = (list) => {
-    let sliceAll = list.length;
-    let slice = 0;
-    let lazy = setInterval(() => {
-      if (slice >= sliceAll) {
-        clearInterval(lazy);
-        return;
-      }
-
-      // 每次加载5张
-      for (let i = 0; i < 5; i++) {
-        slice++;
-        if (slice >= sliceAll) {
-          const photosList = list.slice(0, slice).map((p) => {
-            return {
-              image: p.image,
-              src: p.thumbnail,
-              width: p.width || 0,
-              height: p.height || 0,
-            };
-          });
-          setPhotos(photosList);
-          clearInterval(lazy);
-          return;
-        }
-      }
-    }, 200);
-  };
-
-  const getLightboxList = () => {
+  const getLightboxList = (photoList) => {
     setLightboxPhotos(
-      photos.map((p) => {
+      photoList.map((p) => {
         return { src: p.image };
       }),
     );
   };
 
-  const deletePhoto = (index) => {
-    console.log("delete photo:", index);
-    fetch(fmtUrl("/api/delete"), {
-      headers: {
-        token: getPalaceCode(),
-      },
-      method: "post",
-      mode: "cors",
-      cache: "no-cache",
-      body: JSON.stringify({
-        deleteId: index,
-        deleteName: photos[index].image,
-      }),
-    })
-      .then((res) => {
-        if (res.status === 200) {
-          toast("delete success");
-        } else {
-          toast.error("delete failed");
-        }
-      })
-      .catch(() => {
-        toast.error("delete failed");
-      });
-  };
-
   return (
-    <>
+    <div style={{ textAlign: "center", display: "flex", justifyContent: "center" }}>
       {!init && (
         <div
           style={{
@@ -161,6 +111,7 @@ function Gallery() {
           width: "100%",
           maxWidth: "1440px",
           margin: "1.5rem 0 auto",
+          textAlign: "center",
         }}
       >
         <div
@@ -168,36 +119,37 @@ function Gallery() {
             textAlign: "left",
             marginBottom: "1.5rem",
             paddingBottom: "0.55rem",
-            height: "50px",
+            height: "36px",
             userSelect: "none",
             borderBottom: "2px dashed #FFFFFF20",
           }}
         >
           <span
-            style={{ fontSize: "2.5rem", cursor: "pointer" }}
+            style={{ fontSize: "1.5rem", cursor: "pointer" }}
             onClick={backHome}
           >
-            Back
+            Enjoy
           </span>
           <img className="back-logo" src={logo} onClick={backHome} />
           <span
-            style={{ fontSize: "2.75rem", cursor: "pointer" }}
+            style={{ fontSize: "1.5rem", cursor: "pointer" }}
             onClick={backHome}
           >
-            Home
+            Life
           </span>
         </div>
-        <PhotoAlbum
-          breakpoints={[300, 600, 800, 1200]}
-          padding={20}
-          spacing={20}
+        <RowsPhotoAlbum
+          breakpoints={[1440, 1200, 1080, 640, 384, 256, 128, 96, 64, 48]}
+          padding={5}
+          spacing={8}
           columns={(containerWidth) => {
-            if (containerWidth < 400) return 2;
-            if (containerWidth < 800) return 3;
-            return 4;
+            if (containerWidth <= 400) return 2;
+            if (containerWidth <= 800) return 3;
+            if (containerWidth <= 1000) return 4;
+            if (containerWidth <= 1200) return 5;
+            return 6;
           }}
           photos={photos}
-          layout="rows"
           onClick={({ index }) => {
             setIndex(index);
           }}
@@ -214,24 +166,11 @@ function Gallery() {
           // enable optional lightbox plugins
           plugins={[Fullscreen, Thumbnails, Zoom]}
           on={{ view: (e) => setViewIndex(e.index) }}
-          toolbar={{
-            buttons: [
-              <button
-                key="delete-button"
-                type="button"
-                className="yarl__button"
-                onClick={() => deletePhoto(viewIndex)}
-              >
-                DELETE
-              </button>,
-              "close",
-            ],
-          }}
         />
         <p style={{ textAlign: 'center', marginBottom: 0 }}>Like more & Love more</p>
         <Footer />
       </div>
-    </>
+    </div>
   );
 }
 

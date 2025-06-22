@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"time"
+
+	"gorm.io/gorm/schema"
 	"palace/config"
 	"palace/model"
-	"time"
 
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -41,12 +43,15 @@ func InitDB() {
 
 	for i := 0; i < maxRetries; i++ {
 		db, err = gorm.Open(sqlite.Open(dsn), &gorm.Config{
+			NamingStrategy: schema.NamingStrategy{
+				SingularTable: true,
+			},
 			Logger: newLogger,
 		})
 		if err == nil {
 			pl.Logger.Info("success open the db")
 			DB = db // 将成功连接的db赋值给全局变量
-			return
+			break
 		}
 
 		fmt.Printf("failed to connect to db (retry %d/%d): %v\n", i+1, maxRetries, err)

@@ -1,15 +1,42 @@
 // 登录页 通过中间件拦截页面路由进入
 import {Button, Card, Form, Input, Space} from "antd";
-import {NavLink} from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import {LoginOutlined} from "@ant-design/icons";
+import Header from "./components/Header.jsx";
+import Footer from "./components/Footer.jsx";
+import { apiLogin } from "./api/login.js";
+import { toast } from "react-toastify";
+import { savePalaceCode } from "./util.js";
 
 const Login = () => {
+  const nav = useNavigate();
+
   const login = (e) => {
-    console.log(e)
+    const { user, password } = e;
+    if (!user || !password) {
+      return;
+    }
+    apiLogin({username: user, password: password}).then(res => {
+      if (!res.ok) {
+        toast.error('登录失败');
+        return
+      }
+      res.json().then(res => {
+        const data = res.data;
+        if (data && data !== "") {
+          toast.success('登录成功');
+          savePalaceCode(data);
+          nav('/');
+        } else {
+          toast.error('登录失败, 用户信息认证失败');
+        }
+      })
+    })
   }
   return(
       <>
-        <div style={{ textAlign: "center" }}>
+        <Header />
+        <div style={{ textAlign: "center", marginTop: "2rem" }}>
           <Card title={<p style={{ fontSize: '1.25rem' }}>Login to Palace</p>}>
             <Form
                 name={'login-form'}
@@ -47,6 +74,7 @@ const Login = () => {
             </Form>
           </Card>
         </div>
+        <Footer />
       </>
   )
 }

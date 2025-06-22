@@ -8,6 +8,10 @@
     flex: 1;
 }
 
+.header .ant-menu * {
+    font-size: 16px;
+}
+
 .header .ant-menu-horizontal {
     border: none;
 }

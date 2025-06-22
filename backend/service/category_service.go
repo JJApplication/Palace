@@ -2,9 +2,11 @@ package service
 
 import (
 	"encoding/json"
+
 	"palace/db"
 	"palace/errors"
 	"palace/model"
+	"palace/model/request"
 	"palace/model/response"
 )
 
@@ -17,22 +19,18 @@ func (s *CategoryService) validate(cate response.CategoryRes) error {
 	return nil
 }
 
-func (s *CategoryService) Add(cate response.CategoryRes) error {
-	if err := s.validate(cate); err != nil {
+func (s *CategoryService) Add(cate request.AlbumAddParam) error {
+	if err := s.validate(response.CategoryRes{Name: cate.Name}); err != nil {
 		return err
 	}
-	tags, err := json.Marshal(cate.Tags)
-	if err != nil {
-		return err
-	}
-	return db.DB.Model(&model.Category{}).Create(model.Category{
+	return db.DB.Model(&model.Category{}).Create(&model.Category{
 		Name:         cate.Name,
 		CateDate:     cate.CateDate,
 		CateInfo:     cate.CateInfo,
 		CatePosition: cate.CatePosition,
-		Cover:        "",
+		Cover:        cate.Cover,
 		Theme:        "",
-		Tags:         string(tags),
+		Tags:         "",
 		NeedPassword: 0,
 		Password:     "",
 		DeleteFlag:   0,
@@ -81,25 +79,37 @@ func (s *CategoryService) Delete(cate response.CategoryRes) error {
 	return tx.Commit().Error
 }
 
-func (s *CategoryService) Get(name string) response.CategoryRes {
-	if name == "" {
-		return response.CategoryRes{}
-	}
+func (s *CategoryService) Get(name string, id string) response.CategoryRes {
 	var category model.Category
-	if err := db.DB.Model(&model.Category{}).Where("name=?", name).First(&category).Error; err != nil {
-		return response.CategoryRes{}
+	if name != "" {
+		if err := db.DB.Model(&model.Category{}).Where("name=?", name).First(&category).Error; err != nil {
+			return response.CategoryRes{}
+		}
+		res := category.ToResponse()
+		res.ImageCount = s.GeCateImageCount(category.ID)
+		return res
 	}
-	return category.ToResponse()
+	if id != "" {
+		if err := db.DB.Model(&model.Category{}).Where("id=?", id).First(&category).Error; err != nil {
+			return response.CategoryRes{}
+		}
+		res := category.ToResponse()
+		res.ImageCount = s.GeCateImageCount(category.ID)
+		return res
+	}
+	return response.CategoryRes{}
 }
 
 func (s *CategoryService) GetList() []response.CategoryRes {
 	var categories []model.Category
-	if err := db.DB.Model(&model.Category{}).Find(&categories).Error; err != nil {
-		return nil
+	if err := db.DB.Model(&model.Category{}).Order("create_at asc").Find(&categories).Error; err != nil {
+		return []response.CategoryRes{}
 	}
 	result := make([]response.CategoryRes, 0)
 	for _, category := range categories {
-		result = append(result, category.ToResponse())
+		res := category.ToResponse()
+		res.ImageCount = s.GeCateImageCount(category.ID)
+		result = append(result, res)
 	}
 	return result
 }
@@ -108,7 +118,7 @@ func (s *CategoryService) GetCateImages(cateName string) []response.ImageRes {
 	if cateName == "" {
 		return nil
 	}
-	cateRow := s.Get(cateName)
+	cateRow := s.Get(cateName, "")
 	if cateRow.Name == "" {
 		return nil
 	}
@@ -118,7 +128,7 @@ func (s *CategoryService) GetCateImages(cateName string) []response.ImageRes {
 		return nil
 	}
 	var images []model.Image
-	if err := db.DB.Model(&model.Image{}).Where("uuid IN ?", i2c).Find(&images).Error; err != nil {
+	if err := db.DB.Model(&model.Image{}).Where("uuid IN ?", i2c).Order("create_at asc").Find(&images).Error; err != nil {
 		return nil
 	}
 	result := make([]response.ImageRes, 0)
@@ -126,4 +136,13 @@ func (s *CategoryService) GetCateImages(cateName string) []response.ImageRes {
 		result = append(result, image.ToResponse())
 	}
 	return result
+}
+
+func (s *CategoryService) GeCateImageCount(cateId int) int64 {
+	if cateId < 0 {
+		return 0
+	}
+	var count int64
+	db.DB.Model(&model.ImageCate{}).Where("cate=?", cateId).Count(&count)
+	return count
 }

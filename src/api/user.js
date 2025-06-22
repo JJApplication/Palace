@@ -5,10 +5,22 @@ const apiGetUser = () => {
     headers: {
       token: getPalaceCode(),
     },
-    method: "post",
+    method: "get",
     mode: "cors",
     cache: "no-cache",
   });
 };
 
-export { apiGetUser };
+const apiResetUser = (data) => {
+  return fetch(fmtUrl("/api/user/reset"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+};
+
+export { apiGetUser, apiResetUser };

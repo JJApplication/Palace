@@ -2,6 +2,7 @@ package model
 
 import (
 	"encoding/json"
+
 	"palace/model/response"
 )
 
@@ -45,6 +46,7 @@ func (i *Category) ToResponse() response.CategoryRes {
 		CateInfo:     i.CateInfo,
 		CatePosition: i.CatePosition,
 		Tags:         tags,
+		Cover:        i.Cover,
 		NeedHide:     i.NeedHide,
 		NeedPassword: i.NeedPassword,
 		Password:     "",

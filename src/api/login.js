@@ -1,10 +1,14 @@
 import {fmtUrl, getPalaceCode} from "../util.js";
 
-const apiLogin = () => {
+const apiLogin = (data) => {
   return fetch(fmtUrl('/api/user/login'), {
+    headers: {
+      'Content-Type': 'application/json',
+    },
     method: 'post',
     mode: 'cors',
     cache: 'no-cache',
+    body: JSON.stringify(data),
   })
 }
 
@@ -13,7 +17,7 @@ const apiCheckLogin = () => {
     headers: {
       token: getPalaceCode()
     },
-    method: 'post',
+    method: 'get',
     mode: 'cors',
     cache: 'no-cache',
   })

@@ -7,10 +7,20 @@ import AuthGuard from "../AuthGuard.jsx";
 import NotFound from "../NotFound.jsx";
 import Login from "../Login.jsx";
 import Monitor from "../Monitor.jsx";
+import Blocked from "../Blocked.jsx";
+import User from "../Monitor/User.jsx";
+import GalleryMonitor from "../Monitor/Gallery.jsx";
+import Album from "../Album.jsx";
+import AlbumDetail from "../AlbumDetail.jsx";
+import AlbumMonitor from "../Monitor/Album.jsx";
 
 const router = createBrowserRouter([
   {
     path: "",
+    Component: Home,
+  },
+  {
+    path: "/",
     Component: Home,
   },
   {
@@ -19,15 +29,19 @@ const router = createBrowserRouter([
   },
   {
     path: "/album", // category
-    Component: Gallery,
+    Component: Album,
+  },
+  {
+    path: "/album/:id", // category
+    Component: AlbumDetail,
   },
   {
     path: "/tag", // tag
-    Component: Gallery,
+    Component: NotFound,
   },
   {
     path: "/task", // task
-    Component: Gallery,
+    Component: NotFound,
     loader: AuthGuard,
   },
   {
@@ -36,22 +50,22 @@ const router = createBrowserRouter([
   },
   {
     path: "/monitor/image", // 管理图片
-    Component: Gallery,
+    Component: GalleryMonitor,
     loader: AuthGuard,
   },
   {
     path: "/monitor/album", // 管理相册
-    Component: Gallery,
+    Component: AlbumMonitor,
     loader: AuthGuard,
   },
   {
     path: "/monitor/tag", // 管理标签
-    Component: Gallery,
+    Component: NotFound,
     loader: AuthGuard,
   },
   {
     path: "/monitor/user", // 管理用户
-    Component: Gallery,
+    Component: User,
     loader: AuthGuard,
   },
   {
@@ -60,7 +74,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/blocked", // 无权限
-    Component: Gallery,
+    Component: Blocked,
   },
   {
     path: "*",

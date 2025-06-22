@@ -2,7 +2,7 @@ import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import { Avatar, Button, Card, Flex, Space, Tag } from "antd";
 import "./styles/Monitor.css";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { apiLogout } from "./api/login.js";
 import {
   CloudUploadOutlined,
@@ -16,14 +16,33 @@ import {
   TruckOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { apiUploadImages } from "./api/images.js";
+import { apiGetUser } from "./api/user.js";
+import { clearPalaceCode } from "./util.js";
 
 const Monitor = () => {
+  const nav = useNavigate();
   const ref = useRef();
   const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
   const [status, setStatus] = useState(0); // 上传状态
+
+  const getUser = () => {
+    apiGetUser().then(res => {
+      if (!res.ok) {
+        toast.error('获取用户信息失败')
+        return
+      }
+      res.json().then(data => {
+        setUser(data?.data || {});
+      })
+    })
+  }
+
+  useEffect(() => {
+    getUser();
+  }, [])
 
   const renderPrivilege = (p) => {
     switch (p) {
@@ -65,19 +84,19 @@ const Monitor = () => {
   };
 
   const handleLogout = () => {
-    if (!user || !user.name) {
+    // 强制退出
+    clearPalaceCode();
+    toast("logout successfully.");
+    nav("/login");
+  };
+
+  const openUpload = () => {
+    if (status === 1) {
       return;
     }
-    apiLogout()
-      .then((r) => {
-        if (r.ok) {
-          toast("logout successfully.");
-        }
-      })
-      .catch(() => {
-        toast.error("logout failed.");
-      });
-  };
+    setStatus(0);
+    ref.current.click();
+  }
 
   const startUpload = (e) => {
     if (e.target.files && e.target.files.length <= 0) {
@@ -90,11 +109,10 @@ const Monitor = () => {
       formData.append("files", file);
     }
     apiUploadImages(formData)
-      .then((response) => response.text())
-      .then((data) => {
-        if (data !== "") {
+      .then((res) => {
+        if (!res.ok) {
           setStatus(3);
-          toast.error("upload failed" + data);
+          toast.error("upload failed");
           return;
         }
         setStatus(2);
@@ -115,7 +133,7 @@ const Monitor = () => {
           <Card title={"User Info"}>
             <Flex justify="space-between" align="center">
               <Space size={"large"}>
-                {user?.name ? (
+                {(user?.name && user?.avatar) ? (
                   <Avatar
                     size={{ xs: 32, sm: 48, md: 64, lg: 72, xl: 96, xxl: 100 }}
                     src={user.avatar}
@@ -127,7 +145,7 @@ const Monitor = () => {
                     icon={<UserOutlined />}
                   />
                 )}
-                <span>{user.name || "unknown"}</span>
+                <span style={{ fontSize: '1.25rem' }}>{user.name || "unknown"}</span>
                 {renderPrivilege(user.privilege)}
               </Space>
               <Button
@@ -148,9 +166,10 @@ const Monitor = () => {
                 type="file"
                 onChange={(e) => startUpload(e)}
                 multiple
+                accept="image/*"
                 style={{ display: "none" }}
               />
-              <Button icon={<CloudUploadOutlined />}>
+              <Button icon={<CloudUploadOutlined />} onClick={openUpload}>
                 {changeUpload(status)}
               </Button>
               <Button icon={<ThunderboltOutlined />}>upload livephoto</Button>
