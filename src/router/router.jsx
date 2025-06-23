@@ -9,10 +9,8 @@ import Login from "../Login.jsx";
 import Monitor from "../Monitor.jsx";
 import Blocked from "../Blocked.jsx";
 import User from "../Monitor/User.jsx";
-import GalleryMonitor from "../Monitor/Gallery.jsx";
 import Album from "../Album.jsx";
 import AlbumDetail from "../AlbumDetail.jsx";
-import AlbumMonitor from "../Monitor/Album.jsx";
 
 const router = createBrowserRouter([
   {
@@ -50,12 +48,12 @@ const router = createBrowserRouter([
   },
   {
     path: "/monitor/image", // 管理图片
-    Component: GalleryMonitor,
+    Component: NotFound,
     loader: AuthGuard,
   },
   {
     path: "/monitor/album", // 管理相册
-    Component: AlbumMonitor,
+    Component: NotFound,
     loader: AuthGuard,
   },
   {

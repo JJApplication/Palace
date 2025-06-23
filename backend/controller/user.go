@@ -36,7 +36,9 @@ func (u *UserController) Info(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	code := c.GetHeader("token")
 	if code == "" {
-		ctx.ResponseREST(200, response.JSON{})
+		ctx.ResponseREST(200, response.JSON{
+			Data: service.UserServiceApp.DefaultGuest(),
+		})
 		return
 	}
 	result := service.UserServiceApp.GetUserInfo(code)

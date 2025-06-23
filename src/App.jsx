@@ -22,7 +22,12 @@ function App() {
         closeOnClick={true}
         pauseOnHover={false}
         draggable={true}
+        pauseOnFocusLoss={false}
         theme="light"
+        zIndex={99999}
+        toastStyle={{ zIndex: 99999 }}
+        bodyStyle={{ zIndex: 99999 }}
+        style={{ zIndex: 99999 }}
       />
     </>
   );

@@ -9,13 +9,15 @@ import {
 import { useEffect, useState } from "react";
 import { apiGetUser, apiResetUser } from "../api/user.js";
 import { toast } from "react-toastify";
-import { clearPalaceCode } from "../util.js";
+import { clearPalaceCode, getPrivilege } from "../util.js";
 import { useNavigate } from "react-router";
 import "../styles/User.css";
 
 const User = () => {
   const nav = useNavigate();
   const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
+  const [privilege, setPrivilege] = useState('guest');
+
   const getUser = () => {
     apiGetUser().then((res) => {
       if (!res.ok) {
@@ -24,6 +26,7 @@ const User = () => {
       }
       res.json().then((data) => {
         setUser(data?.data || {});
+        setPrivilege(getPrivilege(data?.data.privilege));
       });
     });
   };

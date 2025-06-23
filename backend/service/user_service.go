@@ -155,14 +155,20 @@ func (s *UserService) GetUser(name string) response.UserRes {
 	return user.ToResponse()
 }
 
+func (s *UserService) DefaultGuest() response.UserRes {
+	return response.UserRes{
+		Privilege: model.Guest,
+	}
+}
+
 func (s *UserService) GetUserInfo(token string) response.UserRes {
 	checkUser := s.decryptToken(token)
 	var user model.User
 	if err := db.DB.Model(&model.User{}).Where("name=?", checkUser.Name).First(&user).Error; err != nil {
-		return response.UserRes{}
+		return s.DefaultGuest()
 	}
 	if checkUser.Password != user.Password {
-		return response.UserRes{}
+		return s.DefaultGuest()
 	}
 	return user.ToResponse()
 }

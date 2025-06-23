@@ -31,8 +31,8 @@ func (u *User) ToResponse() response.UserRes {
 }
 
 const (
-	Admin = iota
-	Manager
+	Guest = iota
+	SuperAdmin
+	Admin
 	Editor
-	Guest
 )

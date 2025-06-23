@@ -93,10 +93,10 @@ func Start() {
 	userGroup := server.Group("/api/user")
 	{
 		userGroup.Handle(http.GET, "/check", controller.UserControllerApp.Check) // 检查用户登录状态
-		userGroup.Handle(http.GET, "/get", CheckLogin, controller.UserControllerApp.Get)
-		userGroup.Handle(http.GET, "/info", CheckLogin, controller.UserControllerApp.Info)
 		userGroup.Handle(http.POST, "/login", controller.UserControllerApp.Login)
-		userGroup.Handle(http.POST, "/reset", controller.UserControllerApp.Reset)
+		userGroup.Handle(http.GET, "/info", controller.UserControllerApp.Info)           // 获取用户信息
+		userGroup.Handle(http.GET, "/get", CheckLogin, controller.UserControllerApp.Get) // 根据名称获取用户信息
+		userGroup.Handle(http.POST, "/reset", CheckLogin, controller.UserControllerApp.Reset)
 	}
 
 	server.Run()

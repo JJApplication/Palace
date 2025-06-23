@@ -202,7 +202,7 @@ func (i *ImageService) Delete(req request.ImageDelReq) error {
 func (i *ImageService) AddCate(req request.ImageCate) error {
 	var ic model.ImageCate
 	if err := db.DB.Model(&model.ImageCate{}).Where("uuid=?", req.UUID).Where("cate=?", req.Cate).First(&ic).Error; err != nil {
-		if !errors.Is(err, gorm.ErrRecordNotFound) {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return db.DB.Model(&model.ImageCate{}).Create(&model.ImageCate{
 				UUID:   req.UUID,
 				CateID: req.Cate,

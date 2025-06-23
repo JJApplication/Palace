@@ -33,3 +33,47 @@ export function withQuery(baseUrl, params) {
   }
   return url
 }
+
+export function getDate(timestamp) {
+  if (timestamp) {
+    const str = timestamp.split('T');
+    return str[0] ? str[0] : timestamp;
+  }
+  return '';
+}
+
+export function getPrivilege(privilege) {
+  switch (privilege) {
+    case 0: {
+      return 'guest';
+    }
+    case 1: {
+      return 'super-admin';
+    }
+    case 2: {
+      return 'admin';
+    }
+    case 3: {
+      return 'editor';
+    }
+    default: {
+      return 'guest';
+    }
+  }
+}
+
+export function isSuperAdmin(p) {
+  return p === 'super-admin';
+}
+
+export function isAdmin(p) {
+  return p === 'super-admin' || p === 'admin';
+}
+
+export function isGuest(p) {
+  return p === 'guest';
+}
+
+export function isEditor(p) {
+  return p === 'editor';
+}

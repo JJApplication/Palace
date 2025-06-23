@@ -1,3 +1,7 @@
 .album-detail {
     margin-top: 2rem;
 }
+
+.album-detail .album-images-list-container {
+    margin-top: 1rem;
+}

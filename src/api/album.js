@@ -8,6 +8,14 @@ const apiGetAlbums = () => {
   });
 }
 
+const apiGetAlbumImageList = (params) => {
+  return fetch(withQuery(fmtUrl("/api/album/images"), params), {
+    method: "get",
+    mode: "cors",
+    cache: "no-cache",
+  });
+}
+
 const apiGetAlbumInfo = (params) => {
   return fetch(withQuery(fmtUrl("/api/album/info"), params), {
     method: "get",
@@ -34,4 +42,4 @@ const apiUpdateAlbum = (data) => {
   });
 }
 
-export { apiGetAlbums, apiGetAlbumInfo, apiAddAlbum,apiUpdateAlbum };
+export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiAddAlbum,apiUpdateAlbum };
