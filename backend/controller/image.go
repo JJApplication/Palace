@@ -47,6 +47,7 @@ func (i *ImageController) List(c *gin.Context) {
 	})
 }
 
+// Info 返回图片信息和所属的相册, 标签
 func (i *ImageController) Info(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	uuid := c.Query("uuid")

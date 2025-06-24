@@ -68,6 +68,7 @@ func Start() {
 		tagGroup.Handle(http.POST, "/add", controller.TagControllerApp.Add)              // 新增标签
 		tagGroup.Handle(http.POST, "/update", controller.TagControllerApp.Update)        // 更新标签
 		tagGroup.Handle(http.POST, "/delete", controller.TagControllerApp.Delete)        // 删除标签
+		tagGroup.Handle(http.POST, "/delete/real", controller.TagControllerApp.Delete)   // 删除标签(物理)
 		tagGroup.Handle(http.POST, "/images/delete", controller.TagControllerApp.Delete) // 删除标签下的图片(新增只能在图片页面操作)
 
 	}
@@ -79,6 +80,7 @@ func Start() {
 		albumGroup.Handle(http.POST, "/add", controller.CategoryControllerApp.Add)              // 新增相册
 		albumGroup.Handle(http.POST, "/update", controller.CategoryControllerApp.Update)        // 更新相册
 		albumGroup.Handle(http.POST, "/delete", controller.CategoryControllerApp.Delete)        // 删除相册
+		albumGroup.Handle(http.POST, "/delete/real", controller.CategoryControllerApp.Delete)   // 删除相册(物理)
 		albumGroup.Handle(http.POST, "/images/delete", controller.CategoryControllerApp.Delete) // 删除相册下的图片(新增只能在图片页面操作)
 	}
 

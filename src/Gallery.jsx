@@ -15,11 +15,21 @@ import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
 import {
   apiDeleteImage,
+  apiGetImageInfo,
   apiGetImageList,
   apiHideImage,
   apiImageAddCate,
 } from "./api/images.js";
-import { Button, Form, Input, Modal, Popconfirm, Select } from "antd";
+import {
+  Button,
+  Form,
+  Input,
+  Modal,
+  Popconfirm,
+  Select,
+  Space,
+  Tag,
+} from "antd";
 import {
   AppstoreAddOutlined,
   DeleteOutlined,
@@ -38,6 +48,7 @@ const Gallery = () => {
 
   const [index, setIndex] = useState(-1);
   const [currentPhoto, setCurrentPhoto] = useState({});
+  const [currentPhotoInfo, setCurrentPhotoInfo] = useState({}); // 当前图片详情包含更加详细的图片信息
   const [viewIndex, setViewIndex] = useState(-1);
   const [privilege, setPrivilege] = useState("guest");
   const [photos, setPhotos] = useState([]);
@@ -135,6 +146,21 @@ const Gallery = () => {
         return { src: p.image };
       }),
     );
+  };
+
+  const getPhotoInfo = () => {
+    if (!currentPhoto || !currentPhoto?.uuid) {
+      return;
+    }
+    apiGetImageInfo({ uuid: currentPhoto.uuid }).then((res) => {
+      if (!res.ok) {
+        toast.error("获取图片信息失败");
+        return;
+      }
+      res.json().then((data) => {
+        setCurrentPhotoInfo(data.data);
+      });
+    });
   };
 
   const hideImage = (uuid, hidden) => {
@@ -273,7 +299,10 @@ const Gallery = () => {
           title="图片信息"
           icon={<FileExclamationOutlined style={{ fontSize: "24px" }} />}
           className="yarl__button"
-          onClick={() => setShowInfo(true)}
+          onClick={async () => {
+            await getPhotoInfo();
+            setShowInfo(true);
+          }}
         ></Button>,
         "close",
       ];
@@ -285,7 +314,10 @@ const Gallery = () => {
         title="图片信息"
         icon={<FileExclamationOutlined style={{ fontSize: "24px" }} />}
         className="yarl__button"
-        onClick={() => setShowInfo(true)}
+        onClick={async () => {
+          await getPhotoInfo();
+          setShowInfo(true);
+        }}
       ></Button>,
       <Button
         style={{ width: "48px", height: "48px" }}
@@ -317,6 +349,31 @@ const Gallery = () => {
     ];
   };
 
+  const renderCategories = (data) => {
+    if (!data) {
+      return null;
+    }
+    return (
+      <Space wrap={true} size={"small"}>
+        {data.map((cate) => {
+          return <Tag key={cate}>{cate}</Tag>;
+        })}
+      </Space>
+    );
+  };
+
+  const renderTags = (data) => {
+    if (!data) {
+      return null;
+    }
+    return (
+      <Space wrap={true} size={"small"}>
+        {data.map((tag) => {
+          return <Tag key={tag}>{tag}</Tag>;
+        })}
+      </Space>
+    );
+  };
   return (
     <div
       style={{ textAlign: "center", display: "flex", justifyContent: "center" }}
@@ -446,6 +503,12 @@ const Gallery = () => {
           </Form.Item>
           <Form.Item label="like" name="like">
             <Input disabled={true} />
+          </Form.Item>
+          <Form.Item label="albums">
+            {renderCategories(currentPhotoInfo?.category)}
+          </Form.Item>
+          <Form.Item label="tags">
+            {renderTags(currentPhotoInfo?.tags)}
           </Form.Item>
         </Form>
       </Modal>

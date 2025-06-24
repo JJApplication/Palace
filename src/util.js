@@ -28,6 +28,13 @@ export function fmtUrl(url) {
 
 export function withQuery(baseUrl, params) {
   const origin = window.location.origin;
+  if (baseUrl.indexOf('http://') > -1 || baseUrl.indexOf('https://') > -1) {
+    const url = new URL(baseUrl);
+    for (let key in params) {
+      url.searchParams.append(key, params[key]);
+    }
+    return url
+  }
   baseUrl = `${origin}${baseUrl}`;
   const url = new URL(baseUrl);
   for (let key in params) {

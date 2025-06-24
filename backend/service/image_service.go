@@ -140,7 +140,34 @@ func (i *ImageService) Info(uuid string) response.ImageRes {
 		log.Logger.ErrorF("get image info error: %s", err.Error())
 		return response.ImageRes{}
 	}
-	return image.ToResponse()
+	result := image.ToResponse()
+	// 查询所属相册
+	var cateIds []int
+	var cates []model.Category
+	if db.DB.Model(&model.ImageCate{}).Where("uuid=?", image.UUID).Select("cate").Find(&cateIds).Error == nil {
+		db.DB.Model(&model.Category{}).Where("id IN ?", cateIds).Find(&cates)
+	}
+	if len(cates) > 0 {
+		var ic []string
+		for _, cate := range cates {
+			ic = append(ic, cate.Name)
+		}
+		result.Category = ic
+	}
+	// 查询所属标签
+	var tagIds []int
+	var tags []model.Tag
+	if db.DB.Model(&model.ImageTag{}).Where("uuid=?", image.UUID).Select("tag").Find(&tagIds).Error == nil {
+		db.DB.Model(&model.Tag{}).Where("id IN ?", tagIds).Find(&tags)
+	}
+	if len(tags) > 0 {
+		var it []string
+		for _, tag := range tags {
+			it = append(it, tag.Name)
+		}
+		result.Tags = it
+	}
+	return result
 }
 
 func (i *ImageService) Modify(image response.ImageRes) error {

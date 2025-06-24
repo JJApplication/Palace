@@ -1,7 +1,15 @@
-import { fmtUrl, getPalaceCode } from "../util.js";
+import {fmtUrl, getPalaceCode, withQuery} from "../util.js";
 
 const apiGetImageList = () => {
   return fetch(fmtUrl("/api/image/list"), {
+    method: "get",
+    mode: "cors",
+    cache: "no-cache",
+  });
+}
+
+const apiGetImageInfo = (params) => {
+  return fetch(withQuery(fmtUrl("/api/image/info"), params), {
     method: "get",
     mode: "cors",
     cache: "no-cache",
@@ -64,4 +72,4 @@ const apiImageAddCate = (data) => {
   })
 }
 
-export { apiGetImageList, apiGetImageCount, apiHideImage, apiUploadImages, apiDeleteImage, apiImageAddCate };
+export { apiGetImageList, apiGetImageInfo, apiGetImageCount, apiHideImage, apiUploadImages, apiDeleteImage, apiImageAddCate };
