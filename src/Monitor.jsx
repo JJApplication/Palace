@@ -7,6 +7,7 @@ import { apiLogout } from "./api/login.js";
 import {
   CloudUploadOutlined,
   InsertRowBelowOutlined,
+  LoginOutlined,
   LogoutOutlined,
   OneToOneOutlined,
   PartitionOutlined,
@@ -29,34 +30,34 @@ const Monitor = () => {
   const [status, setStatus] = useState(0); // 上传状态
 
   const getUser = () => {
-    apiGetUser().then(res => {
+    apiGetUser().then((res) => {
       if (!res.ok) {
-        toast.error('获取用户信息失败')
-        return
+        toast.error("获取用户信息失败");
+        return;
       }
-      res.json().then(data => {
+      res.json().then((data) => {
         setUser(data?.data || {});
-      })
-    })
-  }
+      });
+    });
+  };
 
   useEffect(() => {
     getUser();
-  }, [])
+  }, []);
 
   const renderPrivilege = (p) => {
     switch (p) {
       case 0: {
-        return <Tag color={"gold"}>超级管理员</Tag>;
+        return <Tag color={"pink"}>访客</Tag>;
       }
       case 1: {
-        return <Tag color={"orange"}>管理员</Tag>;
+        return <Tag color={"gold"}>超级管理员</Tag>;
       }
       case 2: {
-        return <Tag color={"geekblue"}>编辑者</Tag>;
+        return <Tag color={"orange"}>管理员</Tag>;
       }
       case 3: {
-        return <Tag color={"pink"}>访客</Tag>;
+        return <Tag color={"geekblue"}>编辑者</Tag>;
       }
       default:
         return <Tag color={"pink"}>访客</Tag>;
@@ -96,7 +97,7 @@ const Monitor = () => {
     }
     setStatus(0);
     ref.current.click();
-  }
+  };
 
   const startUpload = (e) => {
     if (e.target.files && e.target.files.length <= 0) {
@@ -133,7 +134,7 @@ const Monitor = () => {
           <Card title={"User Info"}>
             <Flex justify="space-between" align="center">
               <Space size={"large"}>
-                {(user?.name && user?.avatar) ? (
+                {user?.name && user?.avatar ? (
                   <Avatar
                     size={{ xs: 32, sm: 48, md: 64, lg: 72, xl: 96, xxl: 100 }}
                     src={user.avatar}
@@ -145,36 +146,49 @@ const Monitor = () => {
                     icon={<UserOutlined />}
                   />
                 )}
-                <span style={{ fontSize: '1.25rem' }}>{user.name || "unknown"}</span>
+                <span style={{ fontSize: "1.25rem" }}>
+                  {user.name || "unknown"}
+                </span>
                 {renderPrivilege(user.privilege)}
               </Space>
-              <Button
-                icon={<LogoutOutlined />}
-                onClick={() => {
-                  handleLogout();
-                }}
-              >
-                Logout
-              </Button>
+              {user?.name ? (
+                <Button
+                  icon={<LogoutOutlined />}
+                  onClick={() => {
+                    handleLogout();
+                  }}
+                >
+                  Logout
+                </Button>
+              ) : (
+                <Button
+                  icon={<LoginOutlined />}
+                  onClick={() => {
+                    nav("/login");
+                  }}
+                >
+                  Login
+                </Button>
+              )}
             </Flex>
           </Card>
           <br />
           <Card title={"Image Management"}>
             <Space size={"large"} wrap={true}>
-              <input
-                ref={ref}
-                type="file"
-                onChange={(e) => startUpload(e)}
-                multiple
-                accept="image/*"
-                style={{ display: "none" }}
-              />
               <Button icon={<CloudUploadOutlined />} onClick={openUpload}>
                 {changeUpload(status)}
               </Button>
               <Button icon={<ThunderboltOutlined />}>upload livephoto</Button>
               <Button icon={<TruckOutlined />}>export packs</Button>
               <Button icon={<RestOutlined />}>recycle</Button>
+              <input
+                  ref={ref}
+                  type="file"
+                  onChange={(e) => startUpload(e)}
+                  multiple
+                  accept="image/*"
+                  style={{ display: "none" }}
+              />
             </Space>
           </Card>
           <br />

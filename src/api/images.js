@@ -16,6 +16,18 @@ const apiGetImageCount = () => {
   });
 }
 
+const apiHideImage = (data) => {
+  return fetch(fmtUrl("/api/image/hidden"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+};
+
 const apiUploadImages = (formData) => {
   return fetch(fmtUrl("/api/image/upload"), {
     headers: {
@@ -52,4 +64,4 @@ const apiImageAddCate = (data) => {
   })
 }
 
-export { apiGetImageList, apiGetImageCount, apiUploadImages, apiDeleteImage, apiImageAddCate };
+export { apiGetImageList, apiGetImageCount, apiHideImage, apiUploadImages, apiDeleteImage, apiImageAddCate };

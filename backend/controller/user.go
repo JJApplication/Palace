@@ -106,3 +106,30 @@ func (u *UserController) Reset(c *gin.Context) {
 
 	ctx.ResponseREST(200, response.JSON{})
 }
+
+func (u *UserController) Update(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	var req request.ReqUser
+	if err := c.ShouldBindJSON(&req); err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	code := c.GetHeader("token")
+	if code == "" {
+		ctx.ResponseREST(200, response.JSON{})
+		return
+	}
+	if !service.UserServiceApp.IsSuperAdmin(service.UserServiceApp.GetUserInfo(code)) {
+		ctx.ResponseREST(403, response.JSON{})
+		return
+	}
+	if err := service.UserServiceApp.UpdateUser(req.Username, req.Password); err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+	}
+
+	ctx.ResponseREST(200, response.JSON{})
+}

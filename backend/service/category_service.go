@@ -56,6 +56,8 @@ func (s *CategoryService) Update(cate response.CategoryRes) error {
 		"cate_info":     cate.CateInfo,
 		"cate_position": cate.CatePosition,
 		"tags":          string(tags),
+		"cover":         cate.Cover,
+		"need_hide":     cate.NeedHide,
 		"need_password": cate.NeedPassword,
 		"password":      cate.Password,
 	}

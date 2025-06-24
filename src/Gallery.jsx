@@ -16,12 +16,15 @@ import Header from "./components/Header.jsx";
 import {
   apiDeleteImage,
   apiGetImageList,
+  apiHideImage,
   apiImageAddCate,
 } from "./api/images.js";
-import { Button, Form, Input, Modal, Select } from "antd";
+import { Button, Form, Input, Modal, Popconfirm, Select } from "antd";
 import {
   AppstoreAddOutlined,
   DeleteOutlined,
+  EyeInvisibleOutlined,
+  EyeOutlined,
   FileExclamationOutlined,
   TagOutlined,
 } from "@ant-design/icons";
@@ -87,6 +90,9 @@ const Gallery = () => {
         return true;
       }
     }
+    if (init) {
+      return true;
+    }
 
     return false;
   };
@@ -102,21 +108,25 @@ const Gallery = () => {
   };
 
   const getPhotos = () => {
-    apiGetImageList().then((r) => {
-      r.json().then((res) => {
-        const photosList = res.data.map((p) => {
-          return {
-            image: `/static/image/${p.uuid}${p.ext}`,
-            src: `/static/thumbnail/${p.thumbnail}`,
-            width: p.width,
-            height: p.height,
-            ...p,
-          };
+    apiGetImageList()
+      .then((r) => {
+        r.json().then((res) => {
+          const photosList = res.data.map((p) => {
+            return {
+              image: `/static/image/${p.uuid}${p.ext}`,
+              src: `/static/thumbnail/${p.thumbnail}`,
+              width: p.width,
+              height: p.height,
+              ...p,
+            };
+          });
+          setPhotos(photosList);
+          getLightboxList(photosList);
         });
-        setPhotos(photosList);
-        getLightboxList(photosList);
+      })
+      .catch(() => {
+        setInit(true);
       });
-    });
   };
 
   const getLightboxList = (photoList) => {
@@ -125,6 +135,18 @@ const Gallery = () => {
         return { src: p.image };
       }),
     );
+  };
+
+  const hideImage = (uuid, hidden) => {
+    const data = { uuid: uuid, hide: hidden };
+    const msg = hidden ? "隐藏" : "取消隐藏";
+    apiHideImage(data).then((res) => {
+      if (res.ok) {
+        toast(`图片${msg}成功`);
+        return;
+      }
+      toast.error(`图片${msg}失败`);
+    });
   };
 
   const deletePhoto = () => {
@@ -196,6 +218,53 @@ const Gallery = () => {
   };
 
   const renderPhotoButtons = () => {
+    const hideBtn = () => {
+      if (!currentPhoto?.need_hide || currentPhoto?.need_hide <= 0) {
+        return (
+          <Popconfirm
+            title="(Un)Hide Photo"
+            description="Please confirm before proceeding to the next step."
+            okText="Yes"
+            cancelText="No"
+            getPopupContainer={() => {
+              const root = document.getElementsByClassName("yarl__root")[0];
+              return root ? root : document.body;
+            }}
+            onConfirm={() => hideImage(currentPhoto?.uuid, false)}
+          >
+            <Button
+              style={{ width: "48px", height: "48px" }}
+              key="info-button"
+              title="隐藏图片"
+              icon={<EyeInvisibleOutlined style={{ fontSize: "24px" }} />}
+              className="yarl__button"
+            ></Button>
+          </Popconfirm>
+        );
+      }
+      return (
+        <Popconfirm
+          title="(Un)Hide Photo"
+          description="Please confirm before proceeding to the next step."
+          okText="Yes"
+          cancelText="No"
+          getPopupContainer={() => {
+            const root = document.getElementsByClassName("yarl__root")[0];
+            return root ? root : document.body;
+          }}
+          onConfirm={() => hideImage(currentPhoto?.uuid, false)}
+        >
+          <Button
+            style={{ width: "48px", height: "48px" }}
+            key="info-button"
+            title="取消隐藏"
+            icon={<EyeOutlined style={{ fontSize: "24px" }} />}
+            className="yarl__button"
+          ></Button>
+        </Popconfirm>
+      );
+    };
+
     if (!isAdmin(privilege)) {
       return [
         <Button
@@ -206,7 +275,7 @@ const Gallery = () => {
           className="yarl__button"
           onClick={() => setShowInfo(true)}
         ></Button>,
-        'close'
+        "close",
       ];
     }
     return [
@@ -234,6 +303,7 @@ const Gallery = () => {
         className="yarl__button"
         onClick={() => {}}
       ></Button>,
+      hideBtn(),
       <Button
         style={{ width: "48px", height: "48px" }}
         key="delete-button"

@@ -23,4 +23,17 @@ const apiResetUser = (data) => {
   });
 };
 
-export { apiGetUser, apiResetUser };
+const apiUpdateUser = (data) => {
+  return fetch(fmtUrl("/api/user/update"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+};
+
+
+export { apiGetUser, apiResetUser, apiUpdateUser };

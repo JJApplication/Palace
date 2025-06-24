@@ -1,22 +1,24 @@
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
-import { Avatar, Button, Card, Flex, Form, Input, Space, Tag } from "antd";
+import {Avatar, Button, Card, Flex, Form, Input, Modal, Space, Tag} from "antd";
 import {
-  CheckSquareOutlined,
+  CheckSquareOutlined, LoginOutlined,
   LogoutOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
-import { apiGetUser, apiResetUser } from "../api/user.js";
+import {apiGetUser, apiResetUser, apiUpdateUser} from "../api/user.js";
 import { toast } from "react-toastify";
-import { clearPalaceCode, getPrivilege } from "../util.js";
+import {clearPalaceCode, getPrivilege, isSuperAdmin} from "../util.js";
 import { useNavigate } from "react-router";
 import "../styles/User.css";
 
 const User = () => {
   const nav = useNavigate();
+  const [formReset] = Form.useForm();
   const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
   const [privilege, setPrivilege] = useState('guest');
+  const [showReset, setShowReset] = useState(false)
 
   const getUser = () => {
     apiGetUser().then((res) => {
@@ -82,6 +84,19 @@ const User = () => {
     });
   };
 
+  const updateUser = () => {
+    const data = formReset.getFieldsValue();
+    apiUpdateUser(data).then(res => {
+      if (res.ok) {
+        toast('用户信息更新成功')
+        return;
+      }
+      toast.error('用户信息更新失败')
+    }).finally(() => {
+      formReset.resetFields();
+    })
+  }
+
   return (
     <>
       <Header />
@@ -106,14 +121,25 @@ const User = () => {
               </span>
               {renderPrivilege(user.privilege)}
             </Space>
-            <Button
-              icon={<LogoutOutlined />}
-              onClick={() => {
-                handleLogout();
-              }}
-            >
-              Logout
-            </Button>
+            {user?.name ? (
+                <Button
+                    icon={<LogoutOutlined />}
+                    onClick={() => {
+                      handleLogout();
+                    }}
+                >
+                  Logout
+                </Button>
+            ) : (
+                <Button
+                    icon={<LoginOutlined />}
+                    onClick={() => {
+                      nav("/login");
+                    }}
+                >
+                  Login
+                </Button>
+            )}
           </Flex>
           <Form
             onFinish={(e) => reset(e)}
@@ -137,15 +163,45 @@ const User = () => {
             >
               <Input.Password placeholder="再次确认新密码" />
             </Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              icon={<CheckSquareOutlined />}
-            >
-              Confirm
-            </Button>
+            <Space>
+              <Button
+                  type="primary"
+                  htmlType="submit"
+                  icon={<CheckSquareOutlined />}
+              >
+                Confirm
+              </Button>
+              {isSuperAdmin(privilege) && (
+                  <Button color={"danger"} variant="solid" onClick={() => setShowReset(true )}>
+                    Reset User
+                  </Button>
+              )}
+            </Space>
           </Form>
         </Card>
+        <Modal
+            title={'Reset user'}
+            open={showReset}
+            destroyOnClose={true}
+            footer={null}
+            bodyStyle={{ maxHeight: "640px" }}
+            onCancel={() => {
+              formReset.resetFields();
+              setShowReset(false);
+            }}
+        >
+          <Form form={formReset}>
+            <Form.Item label={'username'} name='username'>
+              <Input />
+            </Form.Item>
+            <Form.Item label={'password'} name='password'>
+              <Input.Password />
+            </Form.Item>
+            <Button type={'primary'} onClick={updateUser} htmlType="submit">
+              Submit
+            </Button>
+          </Form>
+        </Modal>
       </main>
       <Footer />
     </>

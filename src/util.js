@@ -18,7 +18,7 @@ export function clearPalaceCode() {
 
 export function fmtUrl(url) {
   if (DEV) {
-    url = 'http://192.168.0.111:12345' + url
+    url = 'http://127.0.0.1:12345' + url
   }
   if (url.includes('..')) {
     url = url.replaceAll('..', '')
@@ -27,6 +27,8 @@ export function fmtUrl(url) {
 }
 
 export function withQuery(baseUrl, params) {
+  const origin = window.location.origin;
+  baseUrl = `${origin}${baseUrl}`;
   const url = new URL(baseUrl);
   for (let key in params) {
     url.searchParams.append(key, params[key]);

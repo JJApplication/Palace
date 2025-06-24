@@ -155,6 +155,10 @@ func (s *UserService) GetUser(name string) response.UserRes {
 	return user.ToResponse()
 }
 
+func (s *UserService) IsSuperAdmin(user response.UserRes) bool {
+	return user.Privilege == model.SuperAdmin
+}
+
 func (s *UserService) DefaultGuest() response.UserRes {
 	return response.UserRes{
 		Privilege: model.Guest,
@@ -196,7 +200,10 @@ func (s *UserService) AddUser(name string, password string) error {
 
 // UpdateUser 更新用户信息 更新的是nickName
 func (s *UserService) UpdateUser(name string, password string) error {
-	return nil
+	if name == "" || password == "" {
+		return nil
+	}
+	return db.DB.Model(&model.User{}).Where("name=?", name).Update("password", s.hashPassword(password)).Error
 }
 
 // ResetPassword 重置密码

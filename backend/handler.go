@@ -97,6 +97,7 @@ func Start() {
 		userGroup.Handle(http.GET, "/info", controller.UserControllerApp.Info)           // 获取用户信息
 		userGroup.Handle(http.GET, "/get", CheckLogin, controller.UserControllerApp.Get) // 根据名称获取用户信息
 		userGroup.Handle(http.POST, "/reset", CheckLogin, controller.UserControllerApp.Reset)
+		userGroup.Handle(http.POST, "/update", CheckLogin, controller.UserControllerApp.Update)
 	}
 
 	server.Run()
