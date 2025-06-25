@@ -50,6 +50,8 @@ func Start() {
 		imageGroup.Handle(http.GET, "/list", controller.ImageControllerApp.List)                       // 图片列表
 		imageGroup.Handle(http.GET, "/info", controller.ImageControllerApp.Info)                       // 图片信息
 		imageGroup.Handle(http.POST, "/upload", CheckLogin, controller.ImageControllerApp.Upload)      // 上传图片
+		imageGroup.Handle(http.GET, "/recycle", CheckLogin, controller.ImageControllerApp.RecycleList) // 获取回收站图片列表
+		imageGroup.Handle(http.POST, "/recycle", CheckLogin, controller.ImageControllerApp.Recycle)    // 删除回收站图片列表
 		imageGroup.Handle(http.POST, "/hidden", CheckLogin, controller.ImageControllerApp.Hidden)      // 隐藏|取消隐藏图片
 		imageGroup.Handle(http.POST, "/modify", CheckLogin, controller.ImageControllerApp.Modify)      // 修改图片信息
 		imageGroup.Handle(http.POST, "/delete", CheckLogin, controller.ImageControllerApp.Delete)      // 删除图片
@@ -62,26 +64,27 @@ func Start() {
 	}
 	tagGroup := server.Group("/api/tag")
 	{
-		tagGroup.Handle(http.GET, "/list", controller.TagControllerApp.List)             // 查询标签列表 (返回标签下的图片数)
-		tagGroup.Handle(http.GET, "/info", controller.TagControllerApp.Get)              // 查询标签详情
-		tagGroup.Handle(http.GET, "/images", controller.TagControllerApp.GetImages)      // 查询标签下的图片列表
-		tagGroup.Handle(http.POST, "/add", controller.TagControllerApp.Add)              // 新增标签
-		tagGroup.Handle(http.POST, "/update", controller.TagControllerApp.Update)        // 更新标签
-		tagGroup.Handle(http.POST, "/delete", controller.TagControllerApp.Delete)        // 删除标签
-		tagGroup.Handle(http.POST, "/delete/real", controller.TagControllerApp.Delete)   // 删除标签(物理)
-		tagGroup.Handle(http.POST, "/images/delete", controller.TagControllerApp.Delete) // 删除标签下的图片(新增只能在图片页面操作)
+		tagGroup.Handle(http.GET, "/list", controller.TagControllerApp.List)                         // 查询标签列表 (返回标签下的图片数)
+		tagGroup.Handle(http.GET, "/info", controller.TagControllerApp.Get)                          // 查询标签详情
+		tagGroup.Handle(http.GET, "/images", controller.TagControllerApp.GetImages)                  // 查询标签下的图片列表
+		tagGroup.Handle(http.POST, "/add", CheckLogin, controller.TagControllerApp.Add)              // 新增标签
+		tagGroup.Handle(http.POST, "/update", CheckLogin, controller.TagControllerApp.Update)        // 更新标签
+		tagGroup.Handle(http.POST, "/delete", CheckLogin, controller.TagControllerApp.Delete)        // 删除标签
+		tagGroup.Handle(http.POST, "/delete/real", CheckLogin, controller.TagControllerApp.Delete)   // 删除标签(物理)
+		tagGroup.Handle(http.POST, "/images/delete", CheckLogin, controller.TagControllerApp.Delete) // 删除标签下的图片(新增只能在图片页面操作)
 
 	}
 	albumGroup := server.Group("/api/album")
 	{
-		albumGroup.Handle(http.GET, "/list", controller.CategoryControllerApp.List)             // 查询相册列表 (返回相册下的图片数)
-		albumGroup.Handle(http.GET, "/info", controller.CategoryControllerApp.Get)              // 查询相册详情
-		albumGroup.Handle(http.GET, "/images", controller.CategoryControllerApp.GetImages)      // 查询相册下的图片列表
-		albumGroup.Handle(http.POST, "/add", controller.CategoryControllerApp.Add)              // 新增相册
-		albumGroup.Handle(http.POST, "/update", controller.CategoryControllerApp.Update)        // 更新相册
-		albumGroup.Handle(http.POST, "/delete", controller.CategoryControllerApp.Delete)        // 删除相册
-		albumGroup.Handle(http.POST, "/delete/real", controller.CategoryControllerApp.Delete)   // 删除相册(物理)
-		albumGroup.Handle(http.POST, "/images/delete", controller.CategoryControllerApp.Delete) // 删除相册下的图片(新增只能在图片页面操作)
+		albumGroup.Handle(http.GET, "/list", controller.CategoryControllerApp.List)                         // 查询相册列表 (返回相册下的图片数)
+		albumGroup.Handle(http.GET, "/info", controller.CategoryControllerApp.Get)                          // 查询相册详情
+		albumGroup.Handle(http.GET, "/images", controller.CategoryControllerApp.GetImages)                  // 查询相册下的图片列表
+		albumGroup.Handle(http.POST, "/add", CheckLogin, controller.CategoryControllerApp.Add)              // 新增相册
+		albumGroup.Handle(http.POST, "/update", CheckLogin, controller.CategoryControllerApp.Update)        // 更新相册
+		albumGroup.Handle(http.POST, "/cover", CheckLogin, controller.CategoryControllerApp.Cover)          // 设置相册封面
+		albumGroup.Handle(http.POST, "/delete", CheckLogin, controller.CategoryControllerApp.Delete)        // 删除相册
+		albumGroup.Handle(http.POST, "/delete/real", CheckLogin, controller.CategoryControllerApp.Delete)   // 删除相册(物理)
+		albumGroup.Handle(http.POST, "/images/delete", CheckLogin, controller.CategoryControllerApp.Delete) // 删除相册下的图片(新增只能在图片页面操作)
 	}
 
 	// 不再处理重命名和格式转换任务，默认自动转换为jpg

@@ -98,7 +98,7 @@ func (s *TagService) GetTagImages(tagName string) []response.ImageRes {
 		return nil
 	}
 	var images []model.Image
-	if err := db.DB.Model(&model.Image{}).Where("uuid IN ?", i2t).Order("create_at desc").Find(&images).Error; err != nil {
+	if err := db.DB.Model(&model.Image{}).Not("delete_flag", 1).Or("delete_flag IS NULL").Where("uuid IN ?", i2t).Order("create_at desc").Find(&images).Error; err != nil {
 		return nil
 	}
 	result := make([]response.ImageRes, 0)

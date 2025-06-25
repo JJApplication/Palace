@@ -11,6 +11,7 @@ import Blocked from "../Blocked.jsx";
 import User from "../Monitor/User.jsx";
 import Album from "../Album.jsx";
 import AlbumDetail from "../AlbumDetail.jsx";
+import GalleryRecycle from "../GalleryRecycle.jsx";
 
 const router = createBrowserRouter([
   {
@@ -48,7 +49,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/monitor/image", // 管理图片
-    Component: NotFound,
+    Component: GalleryRecycle,
     loader: AuthGuard,
   },
   {

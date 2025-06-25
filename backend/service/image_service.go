@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"mime/multipart"
+	"os"
 	"path/filepath"
 	"strings"
 	"sync"
@@ -123,7 +124,7 @@ func (i *ImageService) Count() int64 {
 
 func (i *ImageService) List() []response.ImageRes {
 	var images []model.Image
-	if err := db.DB.Model(&model.Image{}).Order("create_at desc").Find(&images).Error; err != nil {
+	if err := db.DB.Model(&model.Image{}).Not("delete_flag", 1).Or("delete_flag IS NULL").Order("create_at desc").Find(&images).Error; err != nil {
 		log.Logger.ErrorF("get image list error: %s", err.Error())
 		return []response.ImageRes{}
 	}
@@ -168,6 +169,50 @@ func (i *ImageService) Info(uuid string) response.ImageRes {
 		result.Tags = it
 	}
 	return result
+}
+
+func (i *ImageService) RecycleList() []response.ImageRes {
+	var images []model.Image
+	if err := db.DB.Model(&model.Image{}).Where("delete_flag = ?", 1).Order("create_at desc").Find(&images).Error; err != nil {
+		log.Logger.ErrorF("get image list error: %s", err.Error())
+		return []response.ImageRes{}
+	}
+	result := make([]response.ImageRes, 0, len(images))
+	for _, image := range images {
+		result = append(result, image.ToResponse())
+	}
+	return result
+}
+
+// Recycle 回收删除图片 传入图片的UUID
+func (i *ImageService) Recycle(ids []string) error {
+	var images []model.Image
+	if err := db.DB.Model(&model.Image{}).Where("delete_flag = ?", 1).Where("uuid IN ?", ids).Find(&images).Error; err != nil {
+		log.Logger.ErrorF("get image list error: %s", err.Error())
+		return err
+	}
+	var err error
+	for _, image := range images {
+		err = db.DB.Model(&model.Image{}).Where("uuid = ?", image.UUID).Delete(&model.Image{}).Error
+		if err != nil {
+			log.Logger.ErrorF("delete image [%s] error: %s", image.UUID, err.Error())
+			return err
+		}
+		fileName := fmt.Sprintf("%s%s", image.UUID, image.Ext)
+		originFile := filepath.Join(config.UploadPath, fileName)
+		thumbnailFile := filepath.Join(config.ThumbnailPath, fileName)
+		err = os.RemoveAll(originFile)
+		if err != nil {
+			log.Logger.ErrorF("delete image [%s] error: %s", image.UUID, err.Error())
+			return err
+		}
+		err = os.RemoveAll(thumbnailFile)
+		if err != nil {
+			log.Logger.ErrorF("delete image [%s] error: %s", image.UUID, err.Error())
+			return err
+		}
+	}
+	return err
 }
 
 func (i *ImageService) Modify(image response.ImageRes) error {

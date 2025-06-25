@@ -74,6 +74,24 @@ func (cate *CategoryController) Update(c *gin.Context) {
 	ctx.ResponseREST(200, response.JSON{})
 }
 
+func (cate *CategoryController) Cover(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	var category response.CategoryRes
+	if err := c.ShouldBindJSON(&category); err != nil {
+		ctx.ResponseREST(400, response.JSON{Error: err.Error()})
+		return
+	}
+	if category.ID < 0 {
+		ctx.ResponseREST(400, response.JSON{Error: "id is null"})
+		return
+	}
+	if err := service.CategoryServiceApp.Cover(category); err != nil {
+		ctx.ResponseREST(400, response.JSON{Error: err.Error()})
+		return
+	}
+	ctx.ResponseREST(200, response.JSON{})
+}
+
 func (cate *CategoryController) GetImages(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	name := c.Query("cate")

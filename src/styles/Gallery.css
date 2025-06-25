@@ -1,0 +1,7 @@
+.gallery {
+    height: 100%;
+    width: 100%;
+    max-width:  1440px;
+    margin: 1.5rem 0 auto;
+    text-align: center;
+}

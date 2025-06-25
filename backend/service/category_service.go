@@ -41,6 +41,14 @@ func (s *CategoryService) Add(cate request.AlbumAddParam) error {
 	}).Error
 }
 
+// Cover 设置封面
+func (s *CategoryService) Cover(cate response.CategoryRes) error {
+	updateMaps := map[string]any{
+		"cover": cate.Cover,
+	}
+	return db.DB.Model(&model.Category{}).Where("id=?", cate.ID).Updates(updateMaps).Error
+}
+
 // Update 根据主键更新
 func (s *CategoryService) Update(cate response.CategoryRes) error {
 	if err := s.validate(cate); err != nil {
@@ -130,7 +138,7 @@ func (s *CategoryService) GetCateImages(cateName string) []response.ImageRes {
 		return nil
 	}
 	var images []model.Image
-	if err := db.DB.Model(&model.Image{}).Where("uuid IN ?", i2c).Order("create_at desc").Find(&images).Error; err != nil {
+	if err := db.DB.Model(&model.Image{}).Not("delete_flag", 1).Or("delete_flag IS NULL").Where("uuid IN ?", i2c).Order("create_at desc").Find(&images).Error; err != nil {
 		return nil
 	}
 	result := make([]response.ImageRes, 0)

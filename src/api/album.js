@@ -1,4 +1,4 @@
-import { fmtUrl, withQuery } from "../util.js";
+import {fmtUrl, getPalaceCode, withQuery} from "../util.js";
 
 const apiGetAlbums = () => {
   return fetch(fmtUrl("/api/album/list"), {
@@ -24,8 +24,23 @@ const apiGetAlbumInfo = (params) => {
   });
 }
 
+const apiSetAlbumCover = (data) => {
+  return fetch(fmtUrl("/api/album/cover"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+}
+
 const apiAddAlbum = (data) => {
   return fetch(fmtUrl("/api/album/add"), {
+    headers: {
+      token: getPalaceCode(),
+    },
     method: "post",
     mode: "cors",
     cache: "no-cache",
@@ -35,6 +50,9 @@ const apiAddAlbum = (data) => {
 
 const apiUpdateAlbum = (data) => {
   return fetch(fmtUrl("/api/album/update"), {
+    headers: {
+      token: getPalaceCode(),
+    },
     method: "post",
     mode: "cors",
     cache: "no-cache",
@@ -42,4 +60,4 @@ const apiUpdateAlbum = (data) => {
   });
 }
 
-export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiAddAlbum,apiUpdateAlbum };
+export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiSetAlbumCover, apiAddAlbum,apiUpdateAlbum };

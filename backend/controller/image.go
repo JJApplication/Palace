@@ -61,20 +61,45 @@ func (i *ImageController) Info(c *gin.Context) {
 	})
 }
 
+func (i *ImageController) RecycleList(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	result := service.ImageServiceApp.RecycleList()
+	ctx.ResponseREST(200, response.JSON{
+		Data: result,
+	})
+}
+
+func (i *ImageController) Recycle(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	var ids []string
+	if err := c.ShouldBindJSON(&ids); err != nil {
+		log.Logger.ErrorF("bind json error: %s", err.Error())
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	if err := service.ImageServiceApp.Recycle(ids); err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	ctx.ResponseREST(200, response.JSON{})
+}
+
 func (i *ImageController) Modify(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	var image response.ImageRes
 	if err := c.ShouldBindJSON(&image); err != nil {
 		log.Logger.ErrorF("bind json error: %s", err.Error())
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
 	}
 	if err := service.ImageServiceApp.Modify(image); err != nil {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
@@ -88,21 +113,18 @@ func (i *ImageController) Hidden(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.ErrorF("bind json error: %s", err.Error())
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
 	}
 	if req.UUID == "" {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: "uuid is null",
 		})
 		return
 	}
 	if err := service.ImageServiceApp.Hidden(req); err != nil {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
@@ -116,21 +138,18 @@ func (i *ImageController) Delete(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.ErrorF("bind json error: %s", err.Error())
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
 	}
 	if req.UUID == "" {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: "uuid is null",
 		})
 		return
 	}
 	if err := service.ImageServiceApp.Delete(req); err != nil {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
@@ -145,21 +164,18 @@ func (i *ImageController) AddCate(c *gin.Context) {
 	if err := c.ShouldBindJSON(&req); err != nil {
 		log.Logger.ErrorF("bind json error: %s", err.Error())
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return
 	}
 	if req.UUID == "" || req.Cate < 0 {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: "uuid is null",
 		})
 		return
 	}
 	if err := service.ImageServiceApp.AddCate(req); err != nil {
 		ctx.ResponseREST(400, response.JSON{
-			Data:  nil,
 			Error: err.Error(),
 		})
 		return

@@ -8,25 +8,22 @@ import { Button, Space, Tag, Typography } from "antd";
 import {
   ArrowLeftOutlined,
   CalendarOutlined,
-  LikeOutlined, PictureOutlined
+  EnvironmentOutlined,
+  LikeOutlined,
+  PictureOutlined,
 } from "@ant-design/icons";
-import { RowsPhotoAlbum } from "react-photo-album";
-import Lightbox from "yet-another-react-lightbox";
-import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
-import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
-import Zoom from "yet-another-react-lightbox/plugins/zoom";
+
 import { getDate } from "./util.js";
+
+import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
 
 const AlbumDetail = () => {
   const { Text, Paragraph } = Typography;
   const navigate = useNavigate();
   const { id } = useParams();
+
   const [info, setInfo] = useState({});
-  const [index, setIndex] = useState(-1);
-  const [currentPhoto, setCurrentPhoto] = useState({});
-  const [viewIndex, setViewIndex] = useState(-1);
   const [photos, setPhotos] = useState([]);
-  const [LightboxPhotos, setLightboxPhotos] = useState([]);
 
   const getAlbumInfo = () => {
     if (!id) {
@@ -59,20 +56,12 @@ const AlbumDetail = () => {
             src: `/static/thumbnail/${p.thumbnail}`,
             width: p.width,
             height: p.height,
+            ...p,
           };
         });
         setPhotos(photosList);
-        getLightboxList(photosList);
       });
     });
-  };
-
-  const getLightboxList = (photoList) => {
-    setLightboxPhotos(
-      photoList.map((p) => {
-        return { src: p.image };
-      }),
-    );
   };
 
   return (
@@ -102,37 +91,12 @@ const AlbumDetail = () => {
           <Tag>
             <CalendarOutlined /> 创建日期: {getDate(info.create_at)}
           </Tag>
+          <Tag>
+            <EnvironmentOutlined /> 地点: {getDate(info.cate_position)}
+          </Tag>
         </Space>
         <div className="album-images-list-container">
-          <RowsPhotoAlbum
-            breakpoints={[1440, 1200, 1080, 640, 384, 256, 128, 96, 64, 48]}
-            padding={5}
-            spacing={8}
-            columns={(containerWidth) => {
-              if (containerWidth <= 400) return 2;
-              if (containerWidth <= 800) return 3;
-              if (containerWidth <= 1000) return 4;
-              if (containerWidth <= 1200) return 5;
-              return 6;
-            }}
-            photos={photos}
-            onClick={({ index }) => {
-              setIndex(index);
-            }}
-          />
-
-          <Lightbox
-            slides={LightboxPhotos}
-            open={index >= 0}
-            index={index}
-            close={() => {
-              setIndex(-1);
-              setViewIndex(-1);
-            }}
-            // enable optional lightbox plugins
-            plugins={[Fullscreen, Thumbnails, Zoom]}
-            on={{ view: (e) => setViewIndex(e.index) }}
-          />
+          <PhotoList photos={photos} photoType={PhotoType.album} albumId={id} photosCb={getAlbumInfo} />
           <p style={{ textAlign: "center", marginBottom: 0 }}>
             Like more & Love more
           </p>
