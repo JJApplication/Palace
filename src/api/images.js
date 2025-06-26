@@ -36,8 +36,12 @@ const apiHideImage = (data) => {
   });
 };
 
-const apiUploadImages = (formData) => {
-  return fetch(fmtUrl("/api/image/upload"), {
+const apiUploadImages = (formData, cate) => {
+  let url = fmtUrl("/api/image/upload")
+  if (cate && Number(cate) !== 0) {
+    url += "?cate=" + cate;
+  }
+  return fetch(url, {
     headers: {
       token: getPalaceCode(),
     },

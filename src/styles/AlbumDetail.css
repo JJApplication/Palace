@@ -1,7 +1,19 @@
 .album-detail {
-    margin-top: 2rem;
+    max-width: 1440px;
+    margin: 2rem auto 0 auto;
 }
 
 .album-detail .album-images-list-container {
     margin-top: 1rem;
+}
+
+.ant-list.upload-list-container {
+    max-height: 360px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-width: none;
+}
+
+.ant-list.upload-list-container::-webkit-scrollbar {
+    display: none;
 }

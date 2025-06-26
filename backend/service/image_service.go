@@ -6,6 +6,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 
@@ -61,7 +62,7 @@ func UnHiddenImage(uuid string) {
 	HiddenImagesMap.Delete(uuid + BMP)
 }
 
-func (i *ImageService) Upload(c *gin.Context, form *multipart.Form) error {
+func (i *ImageService) Upload(c *gin.Context, form *multipart.Form, cate string) error {
 	for index, file := range form.File["files"] {
 		log.Logger.InfoF("process [%d] image: %s", index, file.Filename)
 		// 重新生成图片名称
@@ -96,12 +97,23 @@ func (i *ImageService) Upload(c *gin.Context, form *multipart.Form) error {
 			return err
 		}
 
+		// 相册的添加使用异步任务
+		go func() {
+			if cate != "" {
+				cateId, err := strconv.Atoi(cate)
+				if err != nil {
+					log.Logger.ErrorF("add image with cate: %d to db error: %s", cateId, err.Error())
+				}
+				if err := i.AddCate(request.ImageCate{Cate: cateId, UUID: imageId}); err != nil {
+					log.Logger.ErrorF("add image with cate: %d to db error: %s", cateId, err.Error())
+					return
+				}
+				log.Logger.InfoF("add image with cate: %d to db success", cateId)
+			}
+		}()
+
 		go func(fileName, ext string) {
 			// 存库后开始生成缩略图和格式转换任务
-			//if err := utils.ConvertImage(fileName); err != nil {
-			//	log.Logger.ErrorF("convert image thumb: [%s] error: %s", fileName, err.Error())
-			//	return
-			//}
 			if err := utils.CreateImageThumbnail(fileName, ext); err != nil {
 				log.Logger.ErrorF("create thumbnail thumb: [%s] error: %s", fileName, err.Error())
 				return
@@ -124,7 +136,7 @@ func (i *ImageService) Count() int64 {
 
 func (i *ImageService) List() []response.ImageRes {
 	var images []model.Image
-	if err := db.DB.Model(&model.Image{}).Not("delete_flag", 1).Or("delete_flag IS NULL").Order("create_at desc").Find(&images).Error; err != nil {
+	if err := db.DB.Model(&model.Image{}).Where("delete_flag <> 1 OR delete_flag IS NULL").Order("create_at desc").Find(&images).Error; err != nil {
 		log.Logger.ErrorF("get image list error: %s", err.Error())
 		return []response.ImageRes{}
 	}
@@ -273,6 +285,10 @@ func (i *ImageService) Delete(req request.ImageDelReq) error {
 
 func (i *ImageService) AddCate(req request.ImageCate) error {
 	var ic model.ImageCate
+	// 相册必须存在
+	if err := db.DB.Model(&model.Category{}).Where("id=?", req.Cate).First(&model.Category{}).Error; err != nil {
+		return err
+	}
 	if err := db.DB.Model(&model.ImageCate{}).Where("uuid=?", req.UUID).Where("cate=?", req.Cate).First(&ic).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return db.DB.Model(&model.ImageCate{}).Create(&model.ImageCate{

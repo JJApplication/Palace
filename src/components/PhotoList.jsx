@@ -9,15 +9,15 @@ import {
   Space,
   Tag,
 } from "antd";
-import {useEffect, useRef, useState} from "react";
+import { useRef, useState } from "react";
 import { RowsPhotoAlbum } from "react-photo-album";
 import Lightbox from "yet-another-react-lightbox";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
 import Thumbnails from "yet-another-react-lightbox/plugins/thumbnails";
 import Zoom from "yet-another-react-lightbox/plugins/zoom";
-import { apiGetUser } from "../api/user.js";
+
 import { toast } from "react-toastify";
-import { getPrivilege, isAdmin } from "../util.js";
+import { isAdmin } from "../util.js";
 import { apiGetAlbums, apiSetAlbumCover } from "../api/album.js";
 import {
   apiDeleteImage,
@@ -34,7 +34,8 @@ import {
   InfoCircleOutlined,
   TagOutlined,
 } from "@ant-design/icons";
-import {apiRecycleImage} from "../api/recycle.js";
+import { apiRecycleImage } from "../api/recycle.js";
+import HiddenCover from "./HiddenCover.jsx";
 
 const PhotoType = {
   gallery: "gallery",
@@ -43,14 +44,20 @@ const PhotoType = {
   recycle: "recycle",
 };
 
-const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
+const PhotoList = ({
+  photoType,
+  photos,
+  albumId,
+  tagId,
+  photosCb,
+  privilege = "guest",
+}) => {
   const ref = useRef(null);
   const [formCate] = Form.useForm();
 
   const [index, setIndex] = useState(-1);
   const [currentPhoto, setCurrentPhoto] = useState({});
   const [currentPhotoInfo, setCurrentPhotoInfo] = useState({}); // 当前图片详情包含更加详细的图片信息
-  const [privilege, setPrivilege] = useState("guest");
 
   const [showInfo, setShowInfo] = useState(false);
   const [showCate, setShowCate] = useState(false);
@@ -60,22 +67,6 @@ const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
 
   const [categories, setCategories] = useState([]);
   const [tags, setTags] = useState([]);
-
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
-
-  useEffect(() => {
-    getUser();
-  }, []);
 
   const getLightboxList = (photoList) => {
     return photoList.map((p) => {
@@ -130,7 +121,7 @@ const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
       .then((res) => {
         if (res.ok) {
           toast("delete success");
-          photosCb ? photosCb(): null;
+          photosCb ? photosCb() : null;
         } else {
           toast.error("delete failed");
         }
@@ -145,21 +136,21 @@ const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
 
   const recyclePhoto = () => {
     apiRecycleImage([currentPhoto.uuid])
-        .then((res) => {
-          if (res.ok) {
-            toast("delete success");
-            ref?.current?.close();
-            photosCb ? photosCb(): null;
-          } else {
-            toast.error("delete failed");
-          }
-        })
-        .catch(() => {
+      .then((res) => {
+        if (res.ok) {
+          toast("delete success");
+          ref?.current?.close();
+          photosCb ? photosCb() : null;
+        } else {
           toast.error("delete failed");
-        })
-        .finally(() => {
-          setShowDelReal(false);
-        });
+        }
+      })
+      .catch(() => {
+        toast.error("delete failed");
+      })
+      .finally(() => {
+        setShowDelReal(false);
+      });
   };
 
   const openImageCate = () => {
@@ -423,6 +414,13 @@ const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
         onClick={({ index }) => {
           setIndex(index);
         }}
+        render={{
+          extras: (_, { photo }) => {
+            if (!isAdmin(privilege) && (photo && photo?.need_hide >= 1)) {
+              return <HiddenCover />;
+            }
+          },
+        }}
       />
 
       <Lightbox
@@ -431,7 +429,6 @@ const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
         open={index >= 0}
         index={index}
         close={() => {
-          setIndex(-1);
           setIndex(-1);
         }}
         // enable optional lightbox plugins
@@ -551,16 +548,16 @@ const PhotoList = ({ photoType, photos, albumId, tagId, photosCb }) => {
         </Form>
       </Modal>
       <Modal
-          open={showDelReal}
-          title="Delete Image in Storage"
-          destroyOnHidden={true}
-          onCancel={() => setShowDelReal(false)}
-          onOk={recyclePhoto}
-          getContainer={() => {
-            const root = document.getElementsByClassName("yarl__root")[0];
-            return root ? root : document.body;
-          }}
-          style={{ zIndex: 9999 }}
+        open={showDelReal}
+        title="Delete Image in Storage"
+        destroyOnHidden={true}
+        onCancel={() => setShowDelReal(false)}
+        onOk={recyclePhoto}
+        getContainer={() => {
+          const root = document.getElementsByClassName("yarl__root")[0];
+          return root ? root : document.body;
+        }}
+        style={{ zIndex: 9999 }}
       >
         <Form labelCol={{ span: 4 }} initialValues={currentPhoto}>
           <Form.Item label="name" name="name">

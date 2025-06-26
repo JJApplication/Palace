@@ -9,13 +9,29 @@ import Header from "./components/Header.jsx";
 import { apiGetRecycleImageList } from "./api/recycle.js";
 import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
 import './styles/GalleryRecycle.css';
+import {apiGetUser} from "./api/user.js";
+import {getPrivilege} from "./util.js";
 
 const GalleryRecycle = () => {
   const [photos, setPhotos] = useState([]);
+  const [privilege, setPrivilege] = useState("guest");
 
   useEffect(() => {
+    getUser();
     getPhotos();
   }, []);
+
+  const getUser = () => {
+    apiGetUser().then((res) => {
+      if (!res.ok) {
+        toast.error("获取用户信息失败");
+        return;
+      }
+      res.json().then((data) => {
+        setPrivilege(getPrivilege(data?.data.privilege));
+      });
+    });
+  };
 
   const getPhotos = () => {
     apiGetRecycleImageList()
@@ -42,7 +58,7 @@ const GalleryRecycle = () => {
     <div>
       <Header />
       <main className="recycle">
-        <PhotoList photos={photos} photoType={PhotoType.recycle} photosCb={getPhotos} />
+        <PhotoList photos={photos} photoType={PhotoType.recycle} photosCb={getPhotos} privilege={privilege} />
         <p style={{ textAlign: "center", marginBottom: 0 }}>
           Like more & Love more
         </p>

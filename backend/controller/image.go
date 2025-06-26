@@ -14,6 +14,8 @@ type ImageController struct{}
 func (i *ImageController) Upload(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	form, err := c.MultipartForm()
+	// 允许按相册上传
+	cate := c.Query("cate") // 以ID查询相册
 	if err != nil {
 		log.Logger.ErrorF("upload images error: %s", err.Error())
 		ctx.ResponseREST(400, response.JSON{
@@ -22,7 +24,7 @@ func (i *ImageController) Upload(c *gin.Context) {
 		return
 	}
 
-	if err := service.ImageServiceApp.Upload(c, form); err != nil {
+	if err := service.ImageServiceApp.Upload(c, form, cate); err != nil {
 		ctx.ResponseREST(400, response.JSON{
 			Error: err.Error(),
 		})

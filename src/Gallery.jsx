@@ -12,17 +12,21 @@ import {
 } from "./api/images.js";
 import {PhotoList, PhotoType} from "./components/PhotoList.jsx";
 import './styles/Gallery.css';
+import {apiGetUser} from "./api/user.js";
+import {toast} from "react-toastify";
+import {getPrivilege} from "./util.js";
 
 const Gallery = () => {
   const nav = useNavigate();
   const [photos, setPhotos] = useState([]);
   const [init, setInit] = useState(false);
   const [initCode, setInitCode] = useState("#");
-
+  const [privilege, setPrivilege] = useState("guest");
 
   let tick = null;
 
   useEffect(() => {
+    getUser();
     getPhotos();
     initCallback(initCode);
     return () => clearInterval(tick);
@@ -53,6 +57,18 @@ const Gallery = () => {
         setInit(true);
       }
     }, 200);
+  };
+
+  const getUser = () => {
+    apiGetUser().then((res) => {
+      if (!res.ok) {
+        toast.error("获取用户信息失败");
+        return;
+      }
+      res.json().then((data) => {
+        setPrivilege(getPrivilege(data?.data.privilege));
+      });
+    });
   };
 
   const getPhotos = () => {
@@ -124,7 +140,7 @@ const Gallery = () => {
             Life
           </span>
         </div>
-        <PhotoList photoType={PhotoType.gallery} photos={photos} photosCb={getPhotos}/>
+        <PhotoList photoType={PhotoType.gallery} photos={photos} photosCb={getPhotos} privilege={privilege}/>
         <p style={{ textAlign: "center", marginBottom: 0 }}>
           Like more & Love more
         </p>
