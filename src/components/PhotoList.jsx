@@ -4,12 +4,13 @@ import {
   Form,
   Input,
   Modal,
-  Popconfirm, Popover,
+  Popconfirm,
+  Popover,
   Select,
   Space,
   Tag,
 } from "antd";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { RowsPhotoAlbum } from "react-photo-album";
 import Lightbox from "yet-another-react-lightbox";
 import Fullscreen from "yet-another-react-lightbox/plugins/fullscreen";
@@ -32,6 +33,7 @@ import {
   EyeOutlined,
   FlagOutlined,
   InfoCircleOutlined,
+  SyncOutlined,
   TagOutlined,
 } from "@ant-design/icons";
 import { apiRecycleImage } from "../api/recycle.js";
@@ -65,8 +67,14 @@ const PhotoList = ({
   const [showDel, setShowDel] = useState(false);
   const [showDelReal, setShowDelReal] = useState(false);
 
-  const [categories, setCategories] = useState([]);
+  const [categories, setCategories] = useState([]); // 仅在首次加载，用于缓存，增加按钮刷新
   const [tags, setTags] = useState([]);
+
+  useEffect(() => {
+    if (isAdmin(privilege)) {
+      getAllCategories();
+    }
+  }, []);
 
   const getLightboxList = (photoList) => {
     return photoList.map((p) => {
@@ -89,6 +97,30 @@ const PhotoList = ({
     });
   };
 
+  const getAllCategories = (showMessage) => {
+    apiGetAlbums().then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          if (data && data.data) {
+            const cateList = data.data.map((p) => {
+              return {
+                label: p.name,
+                value: p.id,
+              };
+            });
+            setCategories(cateList);
+            if (showMessage) {
+              toast("获取相册列表成功");
+            }
+          }
+        });
+      } else {
+        if (showMessage) {
+          toast.error("获取相册列表失败");
+        }
+      }
+    });
+  };
   const hideImage = (uuid, hidden) => {
     const data = { uuid: uuid, hide: hidden };
     const msg = hidden > 0 ? "隐藏" : "取消隐藏";
@@ -154,24 +186,7 @@ const PhotoList = ({
   };
 
   const openImageCate = () => {
-    apiGetAlbums().then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          if (data && data.data) {
-            const cateList = data.data.map((p) => {
-              return {
-                label: p.name,
-                value: p.id,
-              };
-            });
-            setCategories(cateList);
-            setShowCate(true);
-          }
-        });
-      } else {
-        toast.error("获取相册列表失败");
-      }
-    });
+    setShowCate(true);
   };
 
   const handleImageCateAdd = () => {
@@ -296,26 +311,26 @@ const PhotoList = ({
   const hideBtn = () => {
     if (!currentPhoto?.need_hide || currentPhoto?.need_hide <= 0) {
       return (
-          <Popover
-              key={"hide"}
-              title="Hide Photo"
-              placement="bottom"
-              getPopupContainer={() => {
-                const root = document.getElementsByClassName("yarl__root")[0];
-                return root ? root : document.body;
-              }}
-              trigger="click"
-              content={
-                  <Space>
-                    <Button onClick={() => hideImage(currentPhoto?.uuid, 1)}>
-                      Hide
-                    </Button>
-                    <Button onClick={() => hideImage(currentPhoto?.uuid, 2)}>
-                      Hide From Guest
-                    </Button>
-                  </Space>
-              }
-          >
+        <Popover
+          key={"hide"}
+          title="Hide Photo"
+          placement="bottom"
+          getPopupContainer={() => {
+            const root = document.getElementsByClassName("yarl__root")[0];
+            return root ? root : document.body;
+          }}
+          trigger="click"
+          content={
+            <Space>
+              <Button onClick={() => hideImage(currentPhoto?.uuid, 1)}>
+                Hide
+              </Button>
+              <Button onClick={() => hideImage(currentPhoto?.uuid, 2)}>
+                Hide From Guest
+              </Button>
+            </Space>
+          }
+        >
           <Button
             style={{ width: "48px", height: "48px" }}
             key="info-button"
@@ -323,7 +338,7 @@ const PhotoList = ({
             icon={<EyeInvisibleOutlined style={{ fontSize: "24px" }} />}
             className="yarl__button"
           ></Button>
-      </Popover>
+        </Popover>
       );
     }
     return (
@@ -424,7 +439,7 @@ const PhotoList = ({
         }}
         render={{
           extras: (_, { photo }) => {
-            if (!isAdmin(privilege) && (photo && photo?.need_hide >= 1)) {
+            if (!isAdmin(privilege) && photo && photo?.need_hide >= 1) {
               return <HiddenCover />;
             }
           },
@@ -516,7 +531,15 @@ const PhotoList = ({
         style={{ zIndex: 9999 }}
       >
         <Form form={formCate}>
-          <Form.Item label="category" name="cate">
+          <Form.Item
+            label={
+              <Space size={"small"}>
+                <span>Category</span>
+                <Button icon={<SyncOutlined />} shape="circle" type="primary" size="small" onClick={() => getAllCategories(true)} />
+              </Space>
+            }
+            name="cate"
+          >
             <Select
               getPopupContainer={() => {
                 const root = document.getElementsByClassName("yarl__root")[0];
