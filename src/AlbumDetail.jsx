@@ -299,7 +299,7 @@ const AlbumDetail = () => {
         <Paragraph>
           <Text type={"secondary"}>{info.cate_info}</Text>
         </Paragraph>
-        <Space size={"middle"}>
+        <Space size={"small"} wrap={true}>
           <Tag>
             <PictureOutlined /> 图片: {info.image_count}
           </Tag>
@@ -332,6 +332,9 @@ const AlbumDetail = () => {
         onCancel={() => {
           resetUploadStatus();
           setShowUpload(false);
+          getAlbumInfo();
+        }}
+        onOk={() => {
           getAlbumInfo();
         }}
         destroyOnClose={true}

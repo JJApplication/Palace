@@ -60,4 +60,28 @@ const apiUpdateAlbum = (data) => {
   });
 }
 
-export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiSetAlbumCover, apiAddAlbum,apiUpdateAlbum };
+const apiDeleteAlbum = (data) => {
+  return fetch(fmtUrl("/api/album/delete"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+}
+
+const apiHideAlbum = (data) => {
+  return fetch(fmtUrl("/api/album/hidden"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+};
+
+export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiSetAlbumCover, apiAddAlbum,apiUpdateAlbum, apiDeleteAlbum, apiHideAlbum };

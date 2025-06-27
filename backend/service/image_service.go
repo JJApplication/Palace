@@ -245,8 +245,13 @@ func (i *ImageService) Modify(image response.ImageRes) error {
 
 func (i *ImageService) Hidden(req request.ImageHiddenReq) error {
 	isHidden := 0
-	if req.Hide {
-		isHidden = 1
+	switch req.Hide {
+	case model.HiddenLevel1:
+		isHidden = model.HiddenLevel1
+	case model.HiddenLevel2:
+		isHidden = model.HiddenLevel2
+	default:
+		isHidden = 0
 	}
 	updateMap := map[string]interface{}{
 		"need_hide": isHidden,
@@ -255,7 +260,7 @@ func (i *ImageService) Hidden(req request.ImageHiddenReq) error {
 		log.Logger.ErrorF("update image hidden error: %s", err.Error())
 		return err
 	}
-	if req.Hide {
+	if isHidden > 0 {
 		HiddenImage(req.UUID)
 	} else {
 		UnHiddenImage(req.UUID)
@@ -286,9 +291,12 @@ func (i *ImageService) Delete(req request.ImageDelReq) error {
 func (i *ImageService) AddCate(req request.ImageCate) error {
 	var ic model.ImageCate
 	// 相册必须存在
-	if err := db.DB.Model(&model.Category{}).Where("id=?", req.Cate).First(&model.Category{}).Error; err != nil {
+	var findCate model.Category
+	if err := db.DB.Model(&model.Category{}).Where("id=?", req.Cate).First(&findCate).Error; err != nil {
+		log.Logger.ErrorF("find cate: %d error: %s", req.Cate, err.Error())
 		return err
 	}
+	log.Logger.InfoF("find cate: %d -> %s", req.Cate, findCate.Name)
 	if err := db.DB.Model(&model.ImageCate{}).Where("uuid=?", req.UUID).Where("cate=?", req.Cate).First(&ic).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return db.DB.Model(&model.ImageCate{}).Create(&model.ImageCate{

@@ -2,7 +2,8 @@ package service
 
 import (
 	"encoding/json"
-
+	errpkg "errors"
+	"gorm.io/gorm"
 	"palace/db"
 	"palace/errors"
 	"palace/model"
@@ -77,7 +78,7 @@ func (s *CategoryService) Delete(cate response.CategoryRes) error {
 		return err
 	}
 	tx := db.DB.Begin()
-	if err := tx.Where("id=?", cate.ID).Delete(&model.Category{}).Error; err != nil {
+	if err := tx.Where("id=?", cate.ID).Where("name=?", cate.Name).Delete(&model.Category{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}
@@ -155,4 +156,49 @@ func (s *CategoryService) GeCateImageCount(cateId int) int64 {
 	var count int64
 	db.DB.Model(&model.ImageCate{}).Where("cate=?", cateId).Count(&count)
 	return count
+}
+
+func (s *CategoryService) Hidden(req request.AlbumHiddenReq) error {
+	isHidden := 0
+	switch req.Hide {
+	case model.HiddenLevel1:
+		isHidden = model.HiddenLevel1
+	case model.HiddenLevel2:
+		isHidden = model.HiddenLevel2
+	default:
+		isHidden = 0
+	}
+	updateMap := map[string]interface{}{
+		"need_hide": isHidden,
+	}
+	// 隐藏相册
+	if err := db.DB.Model(&model.Category{}).Where("id=?", req.Cate).Updates(updateMap).Error; err != nil {
+		return err
+	}
+	// 隐藏相册内的图片
+	var cateImages []model.ImageCate
+	if err := db.DB.Model(&model.ImageCate{}).Where("cate=?", req.Cate).Find(&cateImages).Error; err != nil {
+		if errpkg.Is(err, gorm.ErrRecordNotFound) {
+			return nil
+		}
+		return err
+	}
+	// 是否需要隐藏
+	if isHidden > 0 {
+		for _, image := range cateImages {
+			if err := db.DB.Model(&model.Image{}).Where("uuid=?", image.UUID).Updates(updateMap); err != nil {
+				continue
+			}
+			HiddenImage(image.UUID)
+		}
+	} else {
+		for _, image := range cateImages {
+			if err := db.DB.Model(&model.Image{}).Where("uuid=?", image.UUID).Updates(updateMap); err != nil {
+				continue
+			}
+			UnHiddenImage(image.UUID)
+		}
+	}
+
+	return nil
 }

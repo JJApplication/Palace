@@ -45,7 +45,7 @@ func (s *TagService) Update(tag response.TagRes) error {
 
 func (s *TagService) Delete(tag response.TagRes) error {
 	tx := db.DB.Begin()
-	if err := tx.Where("id=?", tag.ID).Delete(&model.Tag{}).Error; err != nil {
+	if err := tx.Where("id=?", tag.ID).Where("name=?", tag.Name).Delete(&model.Tag{}).Error; err != nil {
 		tx.Rollback()
 		return err
 	}

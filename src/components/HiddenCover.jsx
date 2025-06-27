@@ -6,7 +6,7 @@ const HiddenCover = () => {
   return (
     <>
       <div className={"hidden-cover"}>
-        <Tooltip placement={"bottom"} title={"图片已被所有者隐藏, 访客无权查看"}>
+        <Tooltip placement={"right"} title={"图片已被所有者隐藏, 访客无权查看"}>
           <Flex
             align={"center"}
             justify="center"

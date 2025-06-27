@@ -4,6 +4,11 @@ import (
 	"palace/model/response"
 )
 
+const (
+	HiddenLevel1 = 1 // guest可见 无法查看
+	HiddenLevel2 = 2 // guest不可见
+)
+
 // Image 图片模型
 type Image struct {
 	Base
@@ -17,7 +22,7 @@ type Image struct {
 	Description string `json:"description" gorm:"column:description;type:text"`
 	Thumbnail   string `json:"thumbnail" gorm:"column:thumbnail;type:text"`
 	// 高级特性
-	NeedHide     int    `json:"need_hide" gorm:"column:need_hide;type:int"`         // 是否隐藏 隐藏后仅内部用户可以看到
+	NeedHide     int    `json:"need_hide" gorm:"column:need_hide;type:int"`         // 是否隐藏 隐藏后仅内部用户可以看到 1 访客可见 2 访客不可见
 	NeedPassword int    `json:"need_password" gorm:"column:need_password;type:int"` // 访客是否需要口令
 	Password     string `json:"password" gorm:"column:password;type:text"`          // 设置的口令
 	DeleteFlag   int    `json:"delete_flag" gorm:"column:delete_flag;type:int"`     // 删除标识符

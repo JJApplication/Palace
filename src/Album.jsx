@@ -2,19 +2,26 @@ import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import { useEffect, useState } from "react";
 import {
-  Col, Flex,
+  Button,
+  Flex,
   FloatButton,
   Form,
   Input,
   List,
   Modal,
-  Popconfirm, Row,
+  Popconfirm,
+  Popover,
   Skeleton,
   Space,
   Tag,
   Tooltip,
 } from "antd";
-import { apiAddAlbum, apiGetAlbums, apiUpdateAlbum } from "./api/album.js";
+import {
+  apiAddAlbum, apiDeleteAlbum,
+  apiGetAlbums,
+  apiHideAlbum,
+  apiUpdateAlbum,
+} from "./api/album.js";
 import { toast } from "react-toastify";
 import "./styles/Album.css";
 import {
@@ -24,7 +31,8 @@ import {
 } from "@ant-design/icons";
 import { NavLink } from "react-router";
 import { apiGetUser } from "./api/user.js";
-import { getPrivilege, isAdmin } from "./util.js";
+import {getPrivilege, isAdmin, noCover} from "./util.js";
+import { apiHideImage } from "./api/images.js";
 
 const Album = () => {
   const [form] = Form.useForm();
@@ -40,17 +48,19 @@ const Album = () => {
 
   const getAlbums = () => {
     setInit(false);
-    apiGetAlbums().then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          setAlbums(data.data || []);
-        });
-        return;
-      }
-      toast.error("获取相册数据失败");
-    }).finally(() => {
-      setInit(true);
-    });
+    apiGetAlbums()
+      .then((res) => {
+        if (res.ok) {
+          res.json().then((data) => {
+            setAlbums(data.data || []);
+          });
+          return;
+        }
+        toast.error("获取相册数据失败");
+      })
+      .finally(() => {
+        setInit(true);
+      });
   };
 
   const getUser = () => {
@@ -95,12 +105,36 @@ const Album = () => {
     }
   };
 
+  const hideAlbum = (id, hidden) => {
+    const data = { cate: id, hide: hidden };
+    const msg = hidden > 0 ? "隐藏" : "取消隐藏";
+    apiHideAlbum(data).then((res) => {
+      if (res.ok) {
+        toast(`相册${msg}成功`);
+        getAlbums();
+        return;
+      }
+      toast.error(`相册${msg}失败`);
+    });
+  };
+
   const handleCancelAddAlbum = () => {
     setShowAddAlbum(false);
     form.resetFields();
     setAddAlbumInfo({});
   };
-  const handleRemoveAlbum = (item) => {};
+
+  const handleRemoveAlbum = (item) => {
+    const { id, name } = item;
+    apiDeleteAlbum({ id: id, name: name }).then((res) => {
+      if (res.ok) {
+        toast('相册删除成功')
+        getAlbums();
+        return;
+      }
+      toast.error('相册删除失败')
+    })
+  };
 
   const openEditAlbum = (item) => {
     setEditAlbumInfo(item);
@@ -135,6 +169,52 @@ const Album = () => {
     setEditAlbumInfo({});
   };
 
+  const hideBtn = (item) => {
+    if (!item?.need_hide || item?.need_hide <= 0) {
+      return (
+        <Popover
+          key={"hide"}
+          title="Hide Photo"
+          placement="bottom"
+          getPopupContainer={() => {
+            const root = document.getElementsByClassName("yarl__root")[0];
+            return root ? root : document.body;
+          }}
+          trigger="click"
+          content={
+            <Space>
+              <Button onClick={() => hideAlbum(item?.id, 1)}>Hide</Button>
+              <Button onClick={() => hideAlbum(item?.id, 2)}>
+                Hide From Guest
+              </Button>
+            </Space>
+          }
+        >
+          <a key="list-hide" title="隐藏相册" style={{ fontSize: "1.05rem" }}>
+            Hide
+          </a>
+        </Popover>
+      );
+    }
+    return (
+      <Popconfirm
+        key={"unhide"}
+        title="Unhide Photo"
+        description="Please confirm before proceeding to the next step."
+        okText="Yes"
+        cancelText="No"
+        getPopupContainer={() => {
+          const root = document.getElementsByClassName("yarl__root")[0];
+          return root ? root : document.body;
+        }}
+        onConfirm={() => hideAlbum(item?.id, 0)}
+      >
+        <a key="list-unhide" title="取消隐藏" style={{ fontSize: "1.05rem" }}>
+          Unhide
+        </a>
+      </Popconfirm>
+    );
+  };
   const renderActions = (item) => {
     if (!isAdmin(privilege)) {
       return [
@@ -154,11 +234,12 @@ const Album = () => {
       >
         Edit
       </a>,
+      hideBtn(item),
       <Popconfirm
         title={"确认删除"}
         key="list-delete"
         placement={"bottom"}
-        onConfirm={handleRemoveAlbum(item)}
+        onConfirm={() => handleRemoveAlbum(item)}
       >
         <a style={{ fontSize: "1.05rem" }}>Delete</a>
       </Popconfirm>,
@@ -169,23 +250,49 @@ const Album = () => {
     <>
       <Header />
       {!init ? (
-          <div style={{ width: "100%", maxWidth: 720, margin: "4rem auto 0 auto" }}>
-              <Row style={{ width: '100%' }}>
-                <Flex justify="space-between" align="center" style={{ width: '100%' }}>
-                <Col span={18}>
-                  <Space direction={'vertical'} style={{ width: '100%' }}>
-                    <Skeleton.Input active block style={{ width: '65%' }}/>
-                    <Skeleton.Input active block style={{ width: '100%' }} />
-                    <Skeleton.Input active block style={{ width: '100%' }} />
-                    <Skeleton.Input active block style={{ width: '100%' }} />
-                  </Space>
-                </Col>
-                <Col span={4}>
-                  <Skeleton.Image active style={{ width: 172, height: 172 }} />
-                </Col>
-                </Flex>
-              </Row>
-          </div>
+        <div
+          style={{ width: "100%", maxWidth: 720, margin: "4rem auto 0 auto" }}
+        >
+          {[1, 2, 3, 4].map((item, index) => (
+            <Flex
+              key={index}
+              justify="space-between"
+              align="center"
+              style={{ width: "100%", marginBottom: "1.5rem" }}
+            >
+              <Space
+                direction={"vertical"}
+                style={{ width: "calc(100% - 160px)" }}
+              >
+                <Skeleton.Input
+                  active
+                  block
+                  size={"small"}
+                  style={{ width: "65%" }}
+                />
+                <Skeleton.Input
+                  active
+                  block
+                  size={"small"}
+                  style={{ width: "100%" }}
+                />
+                <Skeleton.Input
+                  active
+                  block
+                  size={"small"}
+                  style={{ width: "100%" }}
+                />
+                <Skeleton.Input
+                  active
+                  block
+                  size={"small"}
+                  style={{ width: "100%" }}
+                />
+              </Space>
+              <Skeleton.Image active style={{ width: 128, height: 128 }} />
+            </Flex>
+          ))}
+        </div>
       ) : (
         <main className="album">
           {isAdmin(privilege) && (
@@ -209,8 +316,7 @@ const Album = () => {
                       width={256}
                       alt="logo"
                       src={
-                        item.cover ||
-                        "https://cdn.pixabay.com/photo/2022/01/25/12/16/laptop-6966045_960_720.jpg"
+                        item.cover || noCover()
                       }
                     />
                   </NavLink>

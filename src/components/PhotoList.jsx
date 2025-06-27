@@ -4,7 +4,7 @@ import {
   Form,
   Input,
   Modal,
-  Popconfirm,
+  Popconfirm, Popover,
   Select,
   Space,
   Tag,
@@ -91,7 +91,7 @@ const PhotoList = ({
 
   const hideImage = (uuid, hidden) => {
     const data = { uuid: uuid, hide: hidden };
-    const msg = hidden ? "隐藏" : "取消隐藏";
+    const msg = hidden > 0 ? "隐藏" : "取消隐藏";
     apiHideImage(data).then((res) => {
       if (res.ok) {
         toast(`图片${msg}成功`);
@@ -296,18 +296,26 @@ const PhotoList = ({
   const hideBtn = () => {
     if (!currentPhoto?.need_hide || currentPhoto?.need_hide <= 0) {
       return (
-        <Popconfirm
-          key={"hide"}
-          title="Hide Photo"
-          description="Please confirm before proceeding to the next step."
-          okText="Yes"
-          cancelText="No"
-          getPopupContainer={() => {
-            const root = document.getElementsByClassName("yarl__root")[0];
-            return root ? root : document.body;
-          }}
-          onConfirm={() => hideImage(currentPhoto?.uuid, true)}
-        >
+          <Popover
+              key={"hide"}
+              title="Hide Photo"
+              placement="bottom"
+              getPopupContainer={() => {
+                const root = document.getElementsByClassName("yarl__root")[0];
+                return root ? root : document.body;
+              }}
+              trigger="click"
+              content={
+                  <Space>
+                    <Button onClick={() => hideImage(currentPhoto?.uuid, 1)}>
+                      Hide
+                    </Button>
+                    <Button onClick={() => hideImage(currentPhoto?.uuid, 2)}>
+                      Hide From Guest
+                    </Button>
+                  </Space>
+              }
+          >
           <Button
             style={{ width: "48px", height: "48px" }}
             key="info-button"
@@ -315,13 +323,13 @@ const PhotoList = ({
             icon={<EyeInvisibleOutlined style={{ fontSize: "24px" }} />}
             className="yarl__button"
           ></Button>
-        </Popconfirm>
+      </Popover>
       );
     }
     return (
       <Popconfirm
         key={"unhide"}
-        title="(Un)Hide Photo"
+        title="Unhide Photo"
         description="Please confirm before proceeding to the next step."
         okText="Yes"
         cancelText="No"
@@ -329,7 +337,7 @@ const PhotoList = ({
           const root = document.getElementsByClassName("yarl__root")[0];
           return root ? root : document.body;
         }}
-        onConfirm={() => hideImage(currentPhoto?.uuid, false)}
+        onConfirm={() => hideImage(currentPhoto?.uuid, 0)}
       >
         <Button
           style={{ width: "48px", height: "48px" }}

@@ -1,11 +1,11 @@
 // 工具类
-const PalaceCodeName = 'palaceCode';
-const DEV = import.meta.env.MODE === 'development';
+const PalaceCodeName = "palaceCode";
+const DEV = import.meta.env.MODE === "development";
 
 export function getPalaceCode() {
   const code = localStorage.getItem(PalaceCodeName);
 
-  return code || '';
+  return code || "";
 }
 
 export function savePalaceCode(code) {
@@ -18,66 +18,69 @@ export function clearPalaceCode() {
 
 export function fmtUrl(url) {
   if (DEV) {
-    url = 'http://127.0.0.1:12345' + url
+    url = "http://127.0.0.1:12345" + url;
   }
-  if (url.includes('..')) {
-    url = url.replaceAll('..', '')
+  if (url.includes("..")) {
+    url = url.replaceAll("..", "");
   }
   return url;
 }
 
 export function withQuery(baseUrl, params) {
   const origin = window.location.origin;
-  if (baseUrl.indexOf('http://') <= -1 && baseUrl.indexOf('https://') <= -1) {
+  if (baseUrl.indexOf("http://") <= -1 && baseUrl.indexOf("https://") <= -1) {
     baseUrl = `${origin}${baseUrl}`;
   }
   const url = new URL(baseUrl);
   for (let key in params) {
     url.searchParams.append(key, params[key]);
   }
-  return url
+  return url;
 }
 
 export function getDate(timestamp) {
   if (timestamp) {
-    const str = timestamp.split('T');
+    const str = timestamp.split("T");
     return str[0] ? str[0] : timestamp;
   }
-  return '';
+  return "";
 }
 
+export function noCover() {
+  return "https://cdn.pixabay.com/photo/2022/01/25/12/16/laptop-6966045_960_720.jpg";
+}
 export function getPrivilege(privilege) {
   switch (privilege) {
     case 0: {
-      return 'guest';
+      return "guest";
     }
     case 1: {
-      return 'super-admin';
+      return "super-admin";
     }
     case 2: {
-      return 'admin';
+      return "admin";
     }
     case 3: {
-      return 'editor';
+      return "editor";
     }
     default: {
-      return 'guest';
+      return "guest";
     }
   }
 }
 
 export function isSuperAdmin(p) {
-  return p === 'super-admin';
+  return p === "super-admin";
 }
 
 export function isAdmin(p) {
-  return p === 'super-admin' || p === 'admin';
+  return p === "super-admin" || p === "admin";
 }
 
 export function isGuest(p) {
-  return p === 'guest';
+  return p === "guest";
 }
 
 export function isEditor(p) {
-  return p === 'editor';
+  return p === "editor";
 }

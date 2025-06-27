@@ -1,5 +1,5 @@
 /*
-   Create: 2025/6/14
+   Create: 2025/6/27
    Project: backend
    Github: https://github.com/landers1037
    Copyright Renj
@@ -7,7 +7,7 @@
 
 package request
 
-type ImageHiddenReq struct {
-	UUID string `json:"uuid"`
-	Hide int    `json:"hide"`
+type AlbumHiddenReq struct {
+	Cate int `json:"cate"`
+	Hide int `json:"hide"`
 }
