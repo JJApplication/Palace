@@ -74,7 +74,7 @@ const PhotoList = ({
     if (isAdmin(privilege)) {
       getAllCategories();
     }
-  }, []);
+  }, [privilege]);
 
   const getLightboxList = (photoList) => {
     return photoList.map((p) => {
