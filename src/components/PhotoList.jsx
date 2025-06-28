@@ -126,10 +126,10 @@ const PhotoList = ({
     const msg = hidden > 0 ? "隐藏" : "取消隐藏";
     apiHideImage(data).then((res) => {
       if (res.ok) {
-        toast(`图片${msg}成功`);
+        toast(`图片${msg}成功`, { position: 'bottom-right' });
         return;
       }
-      toast.error(`图片${msg}失败`);
+      toast.error(`图片${msg}失败`, { position: 'bottom-right' });
     });
   };
 
@@ -140,10 +140,10 @@ const PhotoList = ({
     const data = { cover: thumbnail, id: Number(albumId) };
     apiSetAlbumCover(data).then((res) => {
       if (res.ok) {
-        toast("封面设置成功");
+        toast("封面设置成功", { position: 'bottom-right' });
         return;
       }
-      toast.error("封面设置失败");
+      toast.error("封面设置失败", { position: 'bottom-right' });
     });
   };
 
@@ -152,14 +152,14 @@ const PhotoList = ({
     apiDeleteImage(data)
       .then((res) => {
         if (res.ok) {
-          toast("delete success");
+          toast("delete success", { position: 'bottom-right' });
           photosCb ? photosCb() : null;
         } else {
-          toast.error("delete failed");
+          toast.error("delete failed", { position: 'bottom-right' });
         }
       })
       .catch(() => {
-        toast.error("delete failed");
+        toast.error("delete failed",{ position: 'bottom-right' });
       })
       .finally(() => {
         setShowDel(false);
@@ -170,15 +170,15 @@ const PhotoList = ({
     apiRecycleImage([currentPhoto.uuid])
       .then((res) => {
         if (res.ok) {
-          toast("delete success");
+          toast("delete success", { position: 'bottom-right' });
           ref?.current?.close();
           photosCb ? photosCb() : null;
         } else {
-          toast.error("delete failed");
+          toast.error("delete failed", { position: 'bottom-right' });
         }
       })
       .catch(() => {
-        toast.error("delete failed");
+        toast.error("delete failed", { position: 'bottom-right' });
       })
       .finally(() => {
         setShowDelReal(false);
@@ -198,13 +198,13 @@ const PhotoList = ({
     apiImageAddCate(data)
       .then((res) => {
         if (res.ok) {
-          toast("成功添加到相册");
+          toast("成功添加到相册", { position: 'bottom-right' });
           return;
         }
-        toast.error("添加到相册失败");
+        toast.error("添加到相册失败", { position: 'bottom-right' });
       })
       .catch(() => {
-        toast.error("添加到相册失败");
+        toast.error("添加到相册失败", { position: 'bottom-right' });
       })
       .finally(() => {
         formCate.resetFields();

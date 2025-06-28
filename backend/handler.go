@@ -32,7 +32,8 @@ func Start() {
 	server.Init()
 	server.GetEngine().MaxMultipartMemory = 128 << 20
 	server.GetEngine().Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "https://localhost:5173", "http://gallery.renj.io", "https://gallery.renj.io"},
+		//AllowAllOrigins: true,
+		AllowOrigins:     []string{"http://localhost:5173", "http://gallery.renj.io", "https://gallery.renj.io"},
 		AllowHeaders:     []string{"Token", "token", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
 		AllowCredentials: true,
@@ -62,6 +63,8 @@ func Start() {
 		imageGroup.Handle(http.POST, "/cate/modify", CheckLogin, controller.ImageControllerApp.Upload) // 编辑图片的分类相册
 		imageGroup.Handle(http.POST, "/cate/delete", CheckLogin, controller.ImageControllerApp.Upload) // 编辑图片的分类相册
 		imageGroup.Handle(http.POST, "/cate/add", CheckLogin, controller.ImageControllerApp.AddCate)   // 编辑图片的分类相册
+
+		imageGroup.Handle(http.GET, "/storage", CheckLogin, controller.ImageControllerApp.Storage) // 存储详情
 	}
 	tagGroup := server.Group("/api/tag")
 	{

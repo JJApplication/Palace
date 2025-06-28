@@ -1,6 +1,6 @@
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { Avatar, Button, Card, Flex, Space, Tag } from "antd";
+import { Avatar, Button, Card, Col, Flex, Progress, Row, Space, Statistic, Tag } from "antd";
 import "./styles/Monitor.css";
 import { useEffect, useRef, useState } from "react";
 import { apiLogout } from "./api/login.js";
@@ -21,13 +21,16 @@ import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { apiUploadImages } from "./api/images.js";
 import { apiGetUser } from "./api/user.js";
-import { clearPalaceCode } from "./util.js";
+import { clearPalaceCode, getPrivilege, isAdmin } from "./util.js";
+import { apiStorage } from "./api/storage.js";
 
 const Monitor = () => {
   const nav = useNavigate();
   const ref = useRef();
   const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
   const [status, setStatus] = useState(0); // 上传状态
+  const [privilege, setPrivilege] = useState("guest");
+  const [storage, setStorage] = useState({});
 
   const getUser = () => {
     apiGetUser().then((res) => {
@@ -37,14 +40,39 @@ const Monitor = () => {
       }
       res.json().then((data) => {
         setUser(data?.data || {});
+        setPrivilege(getPrivilege(data?.data.privilege));
       });
     });
   };
+
+  const getStorage = () => {
+    if (isAdmin(privilege)) {
+      apiStorage().then(res => {
+        res.json().then((data) => {
+          setStorage(data.data);
+        })
+      })
+    }
+  }
 
   useEffect(() => {
     getUser();
   }, []);
 
+  useEffect(() => {
+    getStorage()
+  }, [privilege]);
+
+  const renderPercent = () => {
+    if (!storage || storage?.max_space <= 0) {
+      return 0
+    }
+    const res = (Number(storage?.total_upload_size) + Number(storage?.total_thumbnail_size)) / Number(storage?.max_space)
+    if (res >= 1) {
+      return 100
+    }
+    return Math.floor(res * 100);
+  }
   const renderPrivilege = (p) => {
     switch (p) {
       case 0: {
@@ -175,7 +203,38 @@ const Monitor = () => {
             </Flex>
           </Card>
           <br />
-          <Card title={"Storage Detail"}></Card>
+          {isAdmin(privilege) && <Card title={"Storage Detail"}>
+            <Row gutter={16}>
+              <Col span={24} style={{ marginBottom: "0.75rem" }}>
+                <p>Storage Usage</p>
+                <Progress
+                  type="dashboard"
+                  steps={8}
+                  percent={renderPercent()}
+                  trailColor="rgba(0, 0, 0, 0.25)"
+                  strokeWidth={20}
+                />
+              </Col>
+              <Col span={12}>
+                <Statistic title="Total Photo" value={storage?.total_upload} />
+              </Col>
+              <Col span={12}>
+                <Statistic title="Photo Size" value={storage?.total_upload_size} />
+              </Col>
+              <Col span={12}>
+                <Statistic title="Total Thumb" value={storage?.total_thumbnail} />
+              </Col>
+              <Col span={12}>
+                <Statistic title="Thumbnail Size" value={storage?.total_thumbnail_size} />
+              </Col>
+              <Col span={12}>
+                <Statistic title="Max SpaceSize" value={storage?.max_space} />
+              </Col>
+              <Col span={12}>
+                <Statistic title="Database" value={storage?.db_size} />
+              </Col>
+            </Row>
+          </Card>}
           <br />
           <Card title={"Image Management"}>
             <Space size={"large"} wrap={true}>

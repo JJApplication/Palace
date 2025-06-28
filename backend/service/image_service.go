@@ -193,6 +193,20 @@ func (i *ImageService) Info(uuid string) response.ImageRes {
 	return result
 }
 
+func (i *ImageService) Storage() response.StorageRes {
+	uploadPath := filepath.Clean(config.UploadPath)
+	thumbnailPath := filepath.Clean(config.ThumbnailPath)
+	dbPath := filepath.Clean(config.DBPath)
+	return response.StorageRes{
+		TotalUpload:        utils.CalcDirFileCount(uploadPath),
+		TotalUploadSize:    utils.CalcDirSize(uploadPath),
+		TotalThumbnail:     utils.CalcDirFileCount(thumbnailPath),
+		TotalThumbnailSize: utils.CalcDirSize(thumbnailPath),
+		MaxSpace:           config.MaxSpace,
+		DBSize:             utils.CalcFileSize(dbPath),
+	}
+}
+
 func (i *ImageService) RecycleList() []response.ImageRes {
 	var images []model.Image
 	if err := db.DB.Model(&model.Image{}).Where("delete_flag = ?", 1).Order("create_at desc").Find(&images).Error; err != nil {

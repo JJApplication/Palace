@@ -29,6 +29,7 @@ var (
 	DBMaxRetry      int
 	AESKey          string
 	CookieDomain    string
+	MaxSpace        int
 )
 
 const (
@@ -50,6 +51,7 @@ const (
 	DefaultPrefix        = "/images"
 	DefaultThumbnail     = "/thumbnails"
 	DefaultNoAccessPhoto = "no-access.jpg"
+	DefaultMaxSpaceSize  = 1024 * 1024 * 1024 * 5
 )
 
 func InitConfig() {
@@ -69,4 +71,5 @@ func InitConfig() {
 	DBMaxRetry = loader.Get("DBMaxRetry").MustInt(DefaultMaxRetry)
 	AESKey = loader.Get("AESKey").MustString(DefaultAESKey)
 	CookieDomain = loader.Get("CookieDomain").MustString(DefaultCookieDomain)
+	MaxSpace = loader.Get("MaxSpace").MustInt(DefaultMaxSpaceSize)
 }

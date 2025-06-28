@@ -335,6 +335,7 @@ const Album = () => {
             dataSource={albums}
             renderItem={(item, index) => (
               <List.Item
+                style={{ position: "relative" }}
                 actions={renderActions(item)}
                 extra={renderCover(item)}
               >

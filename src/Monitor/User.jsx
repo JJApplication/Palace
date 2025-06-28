@@ -41,16 +41,16 @@ const User = () => {
   const renderPrivilege = (p) => {
     switch (p) {
       case 0: {
-        return <Tag color={"gold"}>超级管理员</Tag>;
+        return <Tag color={"pink"}>访客</Tag>;
       }
       case 1: {
-        return <Tag color={"orange"}>管理员</Tag>;
+        return <Tag color={"gold"}>超级管理员</Tag>;
       }
       case 2: {
-        return <Tag color={"geekblue"}>编辑者</Tag>;
+        return <Tag color={"orange"}>管理员</Tag>;
       }
       case 3: {
-        return <Tag color={"pink"}>访客</Tag>;
+        return <Tag color={"geekblue"}>编辑者</Tag>;
       }
       default:
         return <Tag color={"pink"}>访客</Tag>;

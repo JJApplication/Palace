@@ -63,6 +63,14 @@ func (i *ImageController) Info(c *gin.Context) {
 	})
 }
 
+func (i *ImageController) Storage(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	result := service.ImageServiceApp.Storage()
+	ctx.ResponseREST(200, response.JSON{
+		Data: result,
+	})
+}
+
 func (i *ImageController) RecycleList(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	result := service.ImageServiceApp.RecycleList()
