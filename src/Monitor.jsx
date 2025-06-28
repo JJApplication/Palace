@@ -87,8 +87,10 @@ const Monitor = () => {
   const handleLogout = () => {
     // 强制退出
     clearPalaceCode();
-    toast("logout successfully.");
-    nav("/login");
+    apiLogout().then(() => {
+      toast("logout successfully.");
+      nav("/login");
+    });
   };
 
   const openUpload = () => {
@@ -173,6 +175,8 @@ const Monitor = () => {
             </Flex>
           </Card>
           <br />
+          <Card title={"Storage Detail"}></Card>
+          <br />
           <Card title={"Image Management"}>
             <Space size={"large"} wrap={true}>
               <Button icon={<CloudUploadOutlined />} onClick={openUpload}>
@@ -182,12 +186,12 @@ const Monitor = () => {
               <Button icon={<TruckOutlined />}>export packs</Button>
               <Button icon={<RestOutlined />}>recycle</Button>
               <input
-                  ref={ref}
-                  type="file"
-                  onChange={(e) => startUpload(e)}
-                  multiple
-                  accept="image/*"
-                  style={{ display: "none" }}
+                ref={ref}
+                type="file"
+                onChange={(e) => startUpload(e)}
+                multiple
+                accept="image/*"
+                style={{ display: "none" }}
               />
             </Space>
           </Card>

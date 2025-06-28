@@ -32,16 +32,17 @@ func Start() {
 	server.Init()
 	server.GetEngine().MaxMultipartMemory = 128 << 20
 	server.GetEngine().Use(cors.New(cors.Config{
-		AllowAllOrigins: true,
-		AllowHeaders:    []string{"Token", "token", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token"},
-		AllowMethods:    []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowOrigins:     []string{"http://localhost:5173", "https://localhost:5173", "http://gallery.renj.io", "https://gallery.renj.io"},
+		AllowHeaders:     []string{"Token", "token", "Content-Type", "Content-Length", "Accept-Encoding", "X-CSRF-Token"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE"},
+		AllowCredentials: true,
 	}))
 
 	// 静态文件
 	fileGroup := server.Group("/static", AccessHidden)
 	{
-		fileGroup.Static("/image", config.UploadPath)
-		fileGroup.Static("/thumbnail", config.ThumbnailPath)
+		fileGroup.GET("/image/:path", controller.StaticControllerApp.FileImage)
+		fileGroup.GET("/thumbnail/:path", controller.StaticControllerApp.FileThumbnail)
 	}
 	// 按逻辑分组
 	imageGroup := server.Group("/api/image")
@@ -96,6 +97,7 @@ func Start() {
 	{
 		userGroup.Handle(http.GET, "/check", controller.UserControllerApp.Check) // 检查用户登录状态
 		userGroup.Handle(http.POST, "/login", controller.UserControllerApp.Login)
+		userGroup.Handle(http.POST, "/logout", controller.UserControllerApp.Logout)
 		userGroup.Handle(http.GET, "/info", controller.UserControllerApp.Info)           // 获取用户信息
 		userGroup.Handle(http.GET, "/get", CheckLogin, controller.UserControllerApp.Get) // 根据名称获取用户信息
 		userGroup.Handle(http.POST, "/reset", CheckLogin, controller.UserControllerApp.Reset)

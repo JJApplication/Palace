@@ -10,6 +10,7 @@ package controller
 import (
 	"github.com/JJApplication/fushin/server/http"
 	"github.com/gin-gonic/gin"
+	"palace/config"
 	"palace/model/request"
 	"palace/model/response"
 	"palace/service"
@@ -79,9 +80,16 @@ func (u *UserController) Login(c *gin.Context) {
 		return
 	}
 	result := service.UserServiceApp.Login(req.Username, req.Password)
+	ctx.SetCookie("palaceCode", result, 3600, "/", config.CookieDomain, false, true)
 	ctx.ResponseREST(200, response.JSON{
 		Data: result,
 	})
+}
+
+func (u *UserController) Logout(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	ctx.SetCookie("palaceCode", "", -1, "/", config.CookieDomain, false, true)
+	ctx.ResponseREST(200, response.JSON{})
 }
 
 func (u *UserController) Reset(c *gin.Context) {

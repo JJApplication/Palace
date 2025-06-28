@@ -21,6 +21,7 @@ func main() {
 	db.InitDB()
 	task.InitTaskGroup()
 	service.InitService()
+	service.InitHiddenImages()
 	initTaskMap()
 	Start()
 }

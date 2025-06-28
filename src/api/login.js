@@ -8,6 +8,7 @@ const apiLogin = (data) => {
     method: 'post',
     mode: 'cors',
     cache: 'no-cache',
+    credentials: 'include',
     body: JSON.stringify(data),
   })
 }

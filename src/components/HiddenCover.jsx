@@ -2,11 +2,23 @@ import "./HiddenCover.css";
 import { Flex, Tooltip } from "antd";
 import { EyeOutlined } from "@ant-design/icons";
 
-const HiddenCover = () => {
+const HiddenCover = ({ type }) => {
+  let title = "";
+  switch (type) {
+    case "image":
+      title = "图片已被所有者隐藏, 访客无权查看";
+      break;
+    case "album":
+      title = "相册已被所有者隐藏, 访客无权查看";
+      break;
+    default:
+      title = "查看项已被所有者隐藏, 访客无权查看";
+      break;
+  }
   return (
     <>
       <div className={"hidden-cover"}>
-        <Tooltip placement={"right"} title={"图片已被所有者隐藏, 访客无权查看"}>
+        <Tooltip placement={"bottom"} title={title}>
           <Flex
             align={"center"}
             justify="center"

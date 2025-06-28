@@ -159,6 +159,10 @@ func (s *UserService) IsSuperAdmin(user response.UserRes) bool {
 	return user.Privilege == model.SuperAdmin
 }
 
+func (s *UserService) IsAdmin(user response.UserRes) bool {
+	return user.Privilege == model.SuperAdmin || user.Privilege == model.Admin
+}
+
 func (s *UserService) DefaultGuest() response.UserRes {
 	return response.UserRes{
 		Privilege: model.Guest,
@@ -235,6 +239,20 @@ func (s *UserService) CheckUser(token string) bool {
 	dbUser := s.get(user.Name)
 	// 比对密码
 	if user.Password == dbUser.Password {
+		return true
+	}
+	return false
+}
+
+// CheckUserAdmin 检查是否属于admin
+func (s *UserService) CheckUserAdmin(token string) bool {
+	user := s.decryptToken(token)
+	dbUser := s.get(user.Name)
+	// 比对密码
+	if user.Password != dbUser.Password {
+		return false
+	}
+	if s.IsAdmin(response.UserRes{Privilege: dbUser.Privilege, Name: dbUser.Name}) {
 		return true
 	}
 	return false

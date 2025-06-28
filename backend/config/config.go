@@ -23,20 +23,23 @@ var (
 	PalaceCode      string
 	ThumbnailPath   string
 	ThumbnailPrefix string
+	NoAccessPhoto   string
 	DBPath          string
 	DBRetryTime     int
 	DBMaxRetry      int
 	AESKey          string
+	CookieDomain    string
 )
 
 const (
-	DefaultHost      = "0.0.0.0"
-	DefaultPort      = 12345
-	DefaultCode      = "123456"
-	DefaultDB        = "palace.db"
-	DefaultRetryTime = 5
-	DefaultMaxRetry  = 10
-	DefaultAESKey    = "PalacePalacePalacePalacePalaceXX"
+	DefaultHost         = "0.0.0.0"
+	DefaultPort         = 12345
+	DefaultCode         = "123456"
+	DefaultDB           = "palace.db"
+	DefaultRetryTime    = 5
+	DefaultMaxRetry     = 10
+	DefaultAESKey       = "PalacePalacePalacePalacePalaceXX"
+	DefaultCookieDomain = ""
 )
 
 const (
@@ -46,6 +49,7 @@ const (
 	DefaultOutput        = "photos.json"
 	DefaultPrefix        = "/images"
 	DefaultThumbnail     = "/thumbnails"
+	DefaultNoAccessPhoto = "no-access.jpg"
 )
 
 func InitConfig() {
@@ -56,6 +60,7 @@ func InitConfig() {
 	UploadSize = loader.Get("UploadSize").MustInt(DefaultSize)
 	UploadPrefix = loader.Get("UploadPrefix").MustString(DefaultPrefix)
 	PhotoOutput = loader.Get("PhotoOutput").MustString(DefaultOutput)
+	NoAccessPhoto = loader.Get("NoAccessPhoto").MustString(DefaultNoAccessPhoto)
 	PalaceCode = loader.Get("PalaceCode").MustString(DefaultCode)
 	ThumbnailPath = loader.Get("ThumbnailPath").MustString(DefaultThumbnailPath)
 	ThumbnailPrefix = loader.Get("ThumbnailPrefix").MustString(DefaultThumbnail)
@@ -63,4 +68,5 @@ func InitConfig() {
 	DBRetryTime = loader.Get("DBRetryTime").MustInt(DefaultRetryTime)
 	DBMaxRetry = loader.Get("DBMaxRetry").MustInt(DefaultMaxRetry)
 	AESKey = loader.Get("AESKey").MustString(DefaultAESKey)
+	CookieDomain = loader.Get("CookieDomain").MustString(DefaultCookieDomain)
 }

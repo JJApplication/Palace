@@ -1,8 +1,6 @@
 package main
 
 import (
-	"strings"
-
 	"github.com/JJApplication/fushin/server/http"
 	"github.com/gin-gonic/gin"
 	"palace/config"
@@ -18,17 +16,17 @@ AccessHidden 隐藏图片检查中间件 仅管理员可以查看
 */
 
 func AccessHidden(c *http.Context) {
-	url := c.Request.URL
 	// 简化文件判断，默认添加所有的后缀名避免split影响性能
-	filePath := strings.ReplaceAll(url.Path, "/static/", "")
-	if service.IsHidden(filePath) {
-		http.ToWrapperFunc(CheckLogin)(c)
+	path := c.Param("path")
+	if service.IsHidden(path) {
+		http.ToWrapperFunc(CheckCookieValid)(c)
 	} else {
 		c.Next()
 	}
 }
 
 // CheckLogin 前置校验中间件，权限对应编辑者，允许删除图片到回收站
+// 在图片和相册隐藏场景下无法获取到token所以需要使用cookie验证
 func CheckLogin(c *gin.Context) {
 	code := c.Query("palaceCode")
 	if code == "" {
@@ -55,5 +53,25 @@ func CheckLogin(c *gin.Context) {
 		c.AbortWithStatus(403)
 		return
 	}
+	c.Next()
+}
+
+// CheckCookieValid 仅通过cookie判断是否是admin以上用户
+// 不屏蔽在后端直接返回禁用的图片数据
+func CheckCookieValid(c *gin.Context) {
+	cookieCode, err := c.Cookie("palaceCode")
+	if err != nil {
+		// 未携带cookie
+		log.Logger.Info("palaceCode cookie is empty")
+		c.Set("shouldHide", true)
+		c.Next()
+		return
+	}
+	if !service.UserServiceApp.CheckUserAdmin(cookieCode) {
+		c.Set("shouldHide", true)
+		c.Next()
+		return
+	}
+	c.Set("shouldHide", false)
 	c.Next()
 }

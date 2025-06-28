@@ -17,7 +17,8 @@ import {
   Tooltip,
 } from "antd";
 import {
-  apiAddAlbum, apiDeleteAlbum,
+  apiAddAlbum,
+  apiDeleteAlbum,
   apiGetAlbums,
   apiHideAlbum,
   apiUpdateAlbum,
@@ -31,8 +32,8 @@ import {
 } from "@ant-design/icons";
 import { NavLink } from "react-router";
 import { apiGetUser } from "./api/user.js";
-import {getPrivilege, isAdmin, noCover} from "./util.js";
-import { apiHideImage } from "./api/images.js";
+import { getPrivilege, isAdmin, noCover } from "./util.js";
+import HiddenCover from "./components/HiddenCover.jsx";
 
 const Album = () => {
   const [form] = Form.useForm();
@@ -128,12 +129,12 @@ const Album = () => {
     const { id, name } = item;
     apiDeleteAlbum({ id: id, name: name }).then((res) => {
       if (res.ok) {
-        toast('相册删除成功')
+        toast("相册删除成功");
         getAlbums();
         return;
       }
-      toast.error('相册删除失败')
-    })
+      toast.error("相册删除失败");
+    });
   };
 
   const openEditAlbum = (item) => {
@@ -246,6 +247,31 @@ const Album = () => {
     ];
   };
 
+  const renderTitle = (item) => {
+    if (!isAdmin(privilege) && item?.need_hide >= 1) {
+      return (
+        <a href="#" style={{ fontSize: "1.5rem" }}>
+          {item.name}
+        </a>
+      )
+    }
+    return (
+      <a href={`/album/${item.id}`} style={{ fontSize: "1.5rem" }}>
+        {item.name}
+      </a>
+    );
+  };
+  const renderCover = (item) => {
+    if (!isAdmin(privilege) && item?.need_hide >= 1) {
+      return <HiddenCover type="album" />;
+    }
+    return (
+      <NavLink to={`/album/${item.id}`} key="nav-album">
+        <img width={256} alt="logo" src={item.cover || noCover()} />
+      </NavLink>
+    );
+  };
+
   return (
     <>
       <Header />
@@ -310,27 +336,10 @@ const Album = () => {
             renderItem={(item, index) => (
               <List.Item
                 actions={renderActions(item)}
-                extra={
-                  <NavLink to={`/album/${item.id}`} key="nav-album">
-                    <img
-                      width={256}
-                      alt="logo"
-                      src={
-                        item.cover || noCover()
-                      }
-                    />
-                  </NavLink>
-                }
+                extra={renderCover(item)}
               >
                 <List.Item.Meta
-                  title={
-                    <a
-                      href={`/album/${item.id}`}
-                      style={{ fontSize: "1.5rem" }}
-                    >
-                      {item.name}
-                    </a>
-                  }
+                  title={renderTitle(item)}
                   description={
                     <div>
                       <span>{item.cate_info || "暂时没有描述信息"}</span>

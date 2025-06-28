@@ -440,7 +440,7 @@ const PhotoList = ({
         render={{
           extras: (_, { photo }) => {
             if (!isAdmin(privilege) && photo && photo?.need_hide >= 1) {
-              return <HiddenCover />;
+              return <HiddenCover type="image" />;
             }
           },
         }}

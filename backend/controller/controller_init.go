@@ -6,4 +6,5 @@ var (
 	TagControllerApp      = new(TagController)
 	TaskControllerApp     = new(TaskController)
 	UserControllerApp     = new(UserController)
+	StaticControllerApp   = new(StaticController)
 )

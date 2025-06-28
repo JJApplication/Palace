@@ -36,6 +36,16 @@ var (
 	HiddenImagesMap = sync.Map{} // 图片uuid值为键
 )
 
+// InitHiddenImages 初始化隐藏图片仅执行一次
+func InitHiddenImages() {
+	var images []model.Image
+	if err := db.DB.Model(&model.Image{}).Where("need_hide >= 1").Find(&images).Error; err == nil {
+		for _, image := range images {
+			HiddenImage(image.UUID)
+		}
+	}
+}
+
 func IsHidden(fileName string) bool {
 	fileName = strings.ToLower(fileName)
 	if _, ok := HiddenImagesMap.Load(fileName); ok {

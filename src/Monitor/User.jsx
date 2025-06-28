@@ -12,6 +12,7 @@ import { toast } from "react-toastify";
 import {clearPalaceCode, getPrivilege, isSuperAdmin} from "../util.js";
 import { useNavigate } from "react-router";
 import "../styles/User.css";
+import {apiLogout} from "../api/login.js";
 
 const User = () => {
   const nav = useNavigate();
@@ -59,8 +60,10 @@ const User = () => {
   const handleLogout = () => {
     // 强制退出
     clearPalaceCode();
-    toast("logout successfully.");
-    nav("/login");
+    apiLogout().then(() => {
+      toast("logout successfully.");
+      nav("/login");
+    })
   };
 
   const reset = (e) => {
