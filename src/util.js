@@ -84,3 +84,22 @@ export function isGuest(p) {
 export function isEditor(p) {
   return p === "editor";
 }
+
+/**
+ * 根据参数生成真实的图片请求路径
+ * 避免受缓存影响图片请求url增加query参数session,timestamp(以日为最小粒度)
+ * @param path
+ * @param uuid
+ * @param ext
+ */
+export function getImageUrl(path, uuid, ext) {
+  if (!getPalaceCode() || getPalaceCode() === "") {
+    return `${path}${uuid}${ext}`;
+  }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // 将时分秒毫秒设为0
+  const timestamp = today.getTime();
+  const userSession = encodeURIComponent(getPalaceCode())
+
+  return `${path}${uuid}${ext}?session=${userSession}&timestamp=${timestamp}`;
+}

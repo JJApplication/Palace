@@ -1,6 +1,8 @@
 package main
 
 import (
+	"strconv"
+
 	"github.com/JJApplication/fushin/server/http"
 	"github.com/gin-gonic/gin"
 	"palace/config"
@@ -59,6 +61,24 @@ func CheckLogin(c *gin.Context) {
 // CheckCookieValid 仅通过cookie判断是否是admin以上用户
 // 不屏蔽在后端直接返回禁用的图片数据
 func CheckCookieValid(c *gin.Context) {
+	// 通过query查询
+	session := c.Query("session")
+	timestamp := c.Query("timestamp")
+	// 时间必须是当天的图片否则无效
+	if session != "" && timestamp != "" {
+		_, err := strconv.Atoi(timestamp)
+		if err != nil {
+			c.Set("shouldHide", true)
+			c.Next()
+			return
+		}
+		// 需要保证服务器时间和当前时间一致
+		if service.UserServiceApp.CheckUserAdmin(session) {
+			c.Set("shouldHide", false)
+			c.Next()
+			return
+		}
+	}
 	cookieCode, err := c.Cookie("palaceCode")
 	if err != nil {
 		// 未携带cookie

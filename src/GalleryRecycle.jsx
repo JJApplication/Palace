@@ -10,7 +10,7 @@ import { apiGetRecycleImageList } from "./api/recycle.js";
 import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
 import './styles/GalleryRecycle.css';
 import {apiGetUser} from "./api/user.js";
-import {getPrivilege} from "./util.js";
+import { getImageUrl, getPrivilege } from "./util.js";
 
 const GalleryRecycle = () => {
   const [photos, setPhotos] = useState([]);
@@ -39,8 +39,8 @@ const GalleryRecycle = () => {
         r.json().then((res) => {
           const photosList = res.data.map((p) => {
             return {
-              image: `/static/image/${p.uuid}${p.ext}`,
-              src: `/static/thumbnail/${p.thumbnail}`,
+              image: getImageUrl('/static/image/', p.uuid, p.ext),
+              src: getImageUrl('/static/thumbnail/', p.uuid, p.ext),
               width: p.width,
               height: p.height,
               ...p,

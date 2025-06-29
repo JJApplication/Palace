@@ -28,7 +28,7 @@ import {
   PictureOutlined,
 } from "@ant-design/icons";
 
-import { getDate, getPrivilege, isAdmin } from "./util.js";
+import { getDate, getImageUrl, getPrivilege, isAdmin } from "./util.js";
 
 import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
 import { apiGetUser } from "./api/user.js";
@@ -110,8 +110,8 @@ const AlbumDetail = () => {
       r.json().then((res) => {
         const photosList = res.data.map((p) => {
           return {
-            image: `/static/image/${p.uuid}${p.ext}`,
-            src: `/static/thumbnail/${p.thumbnail}`,
+            image: getImageUrl('/static/image/', p.uuid, p.ext),
+            src: getImageUrl('/static/thumbnail/', p.uuid, p.ext),
             width: p.width,
             height: p.height,
             ...p,
