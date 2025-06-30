@@ -202,3 +202,12 @@ func (s *CategoryService) Hidden(req request.AlbumHiddenReq) error {
 
 	return nil
 }
+
+// IsHidden 相册是否隐藏
+func (s *CategoryService) IsHidden(id int) int {
+	var cate model.Category
+	if err := db.DB.Model(&model.Category{}).Where("id=?", id).First(&cate).Error; err != nil {
+		return 0
+	}
+	return cate.NeedHide
+}

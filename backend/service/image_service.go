@@ -87,6 +87,18 @@ func (i *ImageService) Upload(c *gin.Context, form *multipart.Form, cate string)
 		// 保存成功后存库
 		log.Logger.InfoF("process [%d] image: %s->[%s] success", index, file.Filename, fileName)
 		height, width := utils.GetImageEXIF(saveFile)
+		// 对于隐藏的相册 图片创建时默认隐藏
+		isNeedHide := 0
+		if cate == "" {
+			isNeedHide = 0
+		} else {
+			cateId, err := strconv.Atoi(cate)
+			if err != nil {
+				isNeedHide = 0
+			} else {
+				isNeedHide = CategoryServiceApp.IsHidden(cateId)
+			}
+		}
 		if err := db.DB.Create(&model.Image{
 			Name:         file.Filename,
 			UUID:         imageId,
@@ -97,7 +109,7 @@ func (i *ImageService) Upload(c *gin.Context, form *multipart.Form, cate string)
 			Like:         0,
 			Description:  "",
 			Thumbnail:    fileName,
-			NeedHide:     0,
+			NeedHide:     isNeedHide,
 			NeedPassword: 0,
 			Password:     "",
 			DeleteFlag:   0,
@@ -106,6 +118,7 @@ func (i *ImageService) Upload(c *gin.Context, form *multipart.Form, cate string)
 			log.Logger.ErrorF("save image to db error: %s", err.Error())
 			return err
 		}
+		HiddenImage(imageId)
 
 		// 相册的添加使用异步任务
 		go func() {

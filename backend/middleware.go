@@ -20,6 +20,13 @@ AccessHidden 隐藏图片检查中间件 仅管理员可以查看
 func AccessHidden(c *http.Context) {
 	// 简化文件判断，默认添加所有的后缀名避免split影响性能
 	path := c.Param("path")
+	// 时间戳参数为必须项
+	timestamp := c.Query("timestamp")
+	if path == "" || timestamp == "" {
+		c.Set("shouldHide", true)
+		c.Next()
+		return
+	}
 	if service.IsHidden(path) {
 		http.ToWrapperFunc(CheckCookieValid)(c)
 	} else {
