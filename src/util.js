@@ -93,13 +93,25 @@ export function isEditor(p) {
  * @param ext
  */
 export function getImageUrl(path, uuid, ext) {
-  if (!getPalaceCode() || getPalaceCode() === "") {
-    return `${path}${uuid}${ext}`;
-  }
   const today = new Date();
   today.setHours(0, 0, 0, 0); // 将时分秒毫秒设为0
   const timestamp = today.getTime();
+  if (!getPalaceCode() || getPalaceCode() === "") {
+    return `${path}${uuid}${ext}?timestamp=${timestamp}`;
+  }
   const userSession = encodeURIComponent(getPalaceCode())
 
   return `${path}${uuid}${ext}?session=${userSession}&timestamp=${timestamp}`;
+}
+
+export function formatImageUrl(href) {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0); // 将时分秒毫秒设为0
+  const timestamp = today.getTime();
+  if (!getPalaceCode() || getPalaceCode() === "") {
+    return `${href}&timestamp=${timestamp}`;
+  }
+  const userSession = encodeURIComponent(getPalaceCode())
+
+  return `${href}?session=${userSession}&timestamp=${timestamp}`;
 }

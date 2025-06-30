@@ -32,7 +32,7 @@ import {
 } from "@ant-design/icons";
 import { NavLink } from "react-router";
 import { apiGetUser } from "./api/user.js";
-import { getPrivilege, isAdmin, noCover } from "./util.js";
+import { formatImageUrl, getPrivilege, isAdmin, noCover } from "./util.js";
 import HiddenCover from "./components/HiddenCover.jsx";
 
 const Album = () => {
@@ -267,7 +267,7 @@ const Album = () => {
     }
     return (
       <NavLink to={`/album/${item.id}`} key="nav-album">
-        <img width={256} alt="logo" src={item.cover || noCover()} />
+        <img width={256} alt="logo" src={formatImageUrl(item.cover) || noCover()} />
       </NavLink>
     );
   };

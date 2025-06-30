@@ -3,12 +3,14 @@ package service
 import (
 	"encoding/json"
 	errpkg "errors"
+
 	"gorm.io/gorm"
 	"palace/db"
 	"palace/errors"
 	"palace/model"
 	"palace/model/request"
 	"palace/model/response"
+	"palace/utils"
 )
 
 type CategoryService struct{}
@@ -45,7 +47,7 @@ func (s *CategoryService) Add(cate request.AlbumAddParam) error {
 // Cover 设置封面
 func (s *CategoryService) Cover(cate response.CategoryRes) error {
 	updateMaps := map[string]any{
-		"cover": cate.Cover,
+		"cover": utils.CalcCoverUrl(cate.Cover),
 	}
 	return db.DB.Model(&model.Category{}).Where("id=?", cate.ID).Updates(updateMaps).Error
 }
@@ -65,7 +67,7 @@ func (s *CategoryService) Update(cate response.CategoryRes) error {
 		"cate_info":     cate.CateInfo,
 		"cate_position": cate.CatePosition,
 		"tags":          string(tags),
-		"cover":         cate.Cover,
+		"cover":         utils.CalcCoverUrl(cate.Cover),
 		"need_hide":     cate.NeedHide,
 		"need_password": cate.NeedPassword,
 		"password":      cate.Password,
