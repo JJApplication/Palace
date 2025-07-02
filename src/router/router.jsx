@@ -12,6 +12,7 @@ import User from "../Monitor/User.jsx";
 import Album from "../Album.jsx";
 import AlbumDetail from "../AlbumDetail.jsx";
 import GalleryRecycle from "../GalleryRecycle.jsx";
+import Task from "../Monitor/Task.jsx";
 
 const router = createBrowserRouter([
   {
@@ -40,7 +41,7 @@ const router = createBrowserRouter([
   },
   {
     path: "/task", // task
-    Component: NotFound,
+    Component: Task,
     loader: AuthGuard,
   },
   {

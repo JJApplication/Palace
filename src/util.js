@@ -38,6 +38,18 @@ export function withQuery(baseUrl, params) {
   return url;
 }
 
+export function getDateTime(timestamp) {
+  if (timestamp) {
+    let str = timestamp.split("T");
+    const date = str[0];
+    str = str[1].split(".");
+    console.log(str[1]);
+    const time = str[0]
+    return time ? `${date} ${time}` : date;
+  }
+  return "";
+}
+
 export function getDate(timestamp) {
   if (timestamp) {
     const str = timestamp.split("T");
@@ -109,9 +121,16 @@ export function formatImageUrl(href) {
   today.setHours(0, 0, 0, 0); // 将时分秒毫秒设为0
   const timestamp = today.getTime();
   if (!getPalaceCode() || getPalaceCode() === "") {
-    return `${href}&timestamp=${timestamp}`;
+    return `${href}?timestamp=${timestamp}`;
   }
   const userSession = encodeURIComponent(getPalaceCode())
 
   return `${href}?session=${userSession}&timestamp=${timestamp}`;
+}
+
+export function getAvatarUrl(href) {
+  if (href.startsWith("http") || href.startsWith("https")) {
+    return href;
+  }
+  return `/static/avatar/${href}`;
 }

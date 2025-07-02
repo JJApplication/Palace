@@ -13,6 +13,7 @@ import (
 	"palace/log"
 	"palace/service"
 	"palace/task"
+	"palace/utils"
 )
 
 func main() {
@@ -22,6 +23,6 @@ func main() {
 	task.InitTaskGroup()
 	service.InitService()
 	service.InitHiddenImages()
-	initTaskMap()
+	utils.InitDirs()
 	Start()
 }

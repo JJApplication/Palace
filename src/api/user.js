@@ -35,5 +35,29 @@ const apiUpdateUser = (data) => {
   });
 };
 
+const apiResetUserAvatar = () => {
+  return fetch(fmtUrl("/api/user/avatar/reset"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache"
+  });
+};
 
-export { apiGetUser, apiResetUser, apiUpdateUser };
+const apiUploadAvatar = (formData) => {
+  let url = fmtUrl("/api/user/avatar/upload")
+  return fetch(url, {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: formData,
+  });
+};
+
+
+export { apiGetUser, apiResetUser, apiUpdateUser, apiResetUserAvatar, apiUploadAvatar };

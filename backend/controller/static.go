@@ -43,3 +43,15 @@ func (s *StaticController) FileThumbnail(c *gin.Context) {
 	imagePath := filepath.Join(config.ThumbnailPath, path)
 	ctx.ResponseFile(200, imagePath)
 }
+
+func (s *StaticController) FileAvatar(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	path := ctx.Param("path")
+	if path == "" {
+		ctx.ResponseREST(200, nil)
+		return
+	}
+	path = strings.ReplaceAll(path, "..", "")
+	imagePath := filepath.Join(config.AvatarPath, path)
+	ctx.ResponseFile(200, imagePath)
+}

@@ -11,7 +11,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"io"
+	"mime/multipart"
+	"palace/utils"
+	"path/filepath"
 
 	"palace/config"
 	"palace/db"
@@ -208,6 +212,39 @@ func (s *UserService) UpdateUser(name string, password string) error {
 		return nil
 	}
 	return db.DB.Model(&model.User{}).Where("name=?", name).Update("password", s.hashPassword(password)).Error
+}
+
+// UploadAvatar 上传用户头像，按照用户名称存储并更新文件
+func (s *UserService) UploadAvatar(c *gin.Context, token string, form *multipart.FileHeader) (string, error) {
+	// 校验用户
+	user := s.GetUserInfo(token)
+	if user.Name == "" {
+		return "", errors.New("user not found")
+	}
+	log.Logger.InfoF("process %s avatar image: %s", user.Name, form.Filename)
+	// 重新生成图片名称
+	avatarId := utils.CreateImageUUID() // avatar的ID
+	ext := filepath.Ext(form.Filename)
+	fileName := fmt.Sprintf("%s%s", avatarId, ext)
+	saveFile := filepath.Join(config.AvatarPath, fileName)
+	if err := c.SaveUploadedFile(form, saveFile); err != nil {
+		log.Logger.ErrorF("process %s avatar image: %s->[%s] error: %s", user.Name, form.Filename, fileName, err.Error())
+		return "", err
+	}
+	// 保存成功后存库
+	log.Logger.InfoF("process %s avatar image: %s->[%s] success", user.Name, form.Filename, fileName)
+	// user表存储的avatar是uuid+ext // 或者用户的自定义http的url
+	return fileName, db.DB.Model(&model.User{}).Where("name = ?", user.Name).Update("avatar", fileName).Error
+}
+
+func (s *UserService) ReSetAvatar(token string) error {
+	user := s.GetUserInfo(token)
+	if user.Name == "" {
+		return errors.New("user not found")
+	}
+	return db.DB.Model(&model.User{}).Where("name=?", user.Name).Updates(map[string]interface{}{
+		"avatar": "",
+	}).Error
 }
 
 // ResetPassword 重置密码

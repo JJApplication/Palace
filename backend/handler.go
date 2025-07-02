@@ -12,7 +12,6 @@ import (
 	"github.com/gin-contrib/cors"
 	"palace/config"
 	"palace/controller"
-	"palace/service"
 )
 
 // web handler
@@ -40,10 +39,11 @@ func Start() {
 	}))
 
 	// 静态文件
-	fileGroup := server.Group("/static", AccessHidden)
+	fileGroup := server.Group("/static")
 	{
-		fileGroup.GET("/image/:path", controller.StaticControllerApp.FileImage)
-		fileGroup.GET("/thumbnail/:path", controller.StaticControllerApp.FileThumbnail)
+		fileGroup.GET("/image/:path", AccessHidden, controller.StaticControllerApp.FileImage)
+		fileGroup.GET("/thumbnail/:path", AccessHidden, controller.StaticControllerApp.FileThumbnail)
+		fileGroup.GET("/avatar/:path", AccessHidden, controller.StaticControllerApp.FileAvatar)
 	}
 	// 按逻辑分组
 	imageGroup := server.Group("/api/image")
@@ -91,10 +91,14 @@ func Start() {
 	// 不再处理重命名和格式转换任务，默认自动转换为jpg
 	taskGroup := server.Group("/api/task")
 	{
-		taskGroup.Handle(http.GET, "/list", CheckLogin, service.TaskServiceApp.ListTasks)    // 任务列表
-		taskGroup.Handle(http.POST, "/generate", CheckLogin)                                 // 重新生成索引
-		taskGroup.Handle(http.POST, "/resize", CheckLogin)                                   // 重新调整图片大小
-		taskGroup.Handle(http.POST, "/clean", CheckLogin, service.TaskServiceApp.CleanImage) // 重新调整图片大小
+		taskGroup.Handle(http.GET, "/list", CheckLogin, controller.TaskControllerApp.List)                 // 任务列表
+		taskGroup.Handle(http.POST, "/clear/task", CheckLogin, controller.TaskControllerApp.ClearTasks)    // 清理任务
+		taskGroup.Handle(http.POST, "/clear/image", CheckLogin, controller.TaskControllerApp.ClearImages)  // 清理不存在的图片
+		taskGroup.Handle(http.POST, "/removepos", CheckLogin, controller.TaskControllerApp.RemovePosition) // 删除图片的位置信息
+		taskGroup.Handle(http.POST, "/package", CheckLogin, controller.TaskControllerApp.PackageImage)     // 打包图片
+		taskGroup.Handle(http.POST, "/sync/hide", CheckLogin, controller.TaskControllerApp.SyncHidden)     // 同步隐藏的图片
+		taskGroup.Handle(http.POST, "/sync/image", CheckLogin, controller.TaskControllerApp.SyncImageLike) // 同步图片的赞
+		taskGroup.Handle(http.POST, "/sync/album", CheckLogin, controller.TaskControllerApp.SyncAlbumLike) // 同步相册的赞
 	}
 	userGroup := server.Group("/api/user")
 	{
@@ -105,6 +109,8 @@ func Start() {
 		userGroup.Handle(http.GET, "/get", CheckLogin, controller.UserControllerApp.Get) // 根据名称获取用户信息
 		userGroup.Handle(http.POST, "/reset", CheckLogin, controller.UserControllerApp.Reset)
 		userGroup.Handle(http.POST, "/update", CheckLogin, controller.UserControllerApp.Update)
+		userGroup.Handle(http.POST, "/avatar/upload", CheckLogin, controller.UserControllerApp.UploadAvatar) // 上传并设置头像
+		userGroup.Handle(http.POST, "/avatar/reset", CheckLogin, controller.UserControllerApp.ReSetAvatar)   // 重置头像
 	}
 
 	server.Run()

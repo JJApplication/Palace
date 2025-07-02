@@ -72,6 +72,7 @@ func InitDB() {
 		&model.Tag{},
 		&model.ImageCate{},
 		&model.ImageTag{},
+		&model.Task{},
 	)
 	if err != nil {
 		pl.Logger.ErrorF("failed to migrate db %v\n", err)

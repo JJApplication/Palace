@@ -141,3 +141,44 @@ func (u *UserController) Update(c *gin.Context) {
 
 	ctx.ResponseREST(200, response.JSON{})
 }
+
+func (u *UserController) UploadAvatar(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	code := c.GetHeader("token")
+	if code == "" {
+		ctx.ResponseREST(200, response.JSON{})
+		return
+	}
+	form, err := c.FormFile("file")
+	if err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	avatar, err := service.UserServiceApp.UploadAvatar(c, code, form)
+	if err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	ctx.ResponseREST(200, response.JSON{Data: avatar})
+}
+
+func (u *UserController) ReSetAvatar(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	code := c.GetHeader("token")
+	if code == "" {
+		ctx.ResponseREST(200, response.JSON{})
+		return
+	}
+	if err := service.UserServiceApp.ReSetAvatar(code); err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+	}
+
+	ctx.ResponseREST(200, response.JSON{})
+}

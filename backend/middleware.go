@@ -3,7 +3,6 @@ package main
 import (
 	"strconv"
 
-	"github.com/JJApplication/fushin/server/http"
 	"github.com/gin-gonic/gin"
 	"palace/config"
 	"palace/log"
@@ -17,7 +16,7 @@ AccessHidden 隐藏图片检查中间件 仅管理员可以查看
 为避免正常图片加载需要走校验，内部维护隐藏图片的字典
 */
 
-func AccessHidden(c *http.Context) {
+func AccessHidden(c *gin.Context) {
 	// 简化文件判断，默认添加所有的后缀名避免split影响性能
 	path := c.Param("path")
 	// 时间戳参数为必须项
@@ -28,7 +27,7 @@ func AccessHidden(c *http.Context) {
 		return
 	}
 	if service.IsHidden(path) {
-		http.ToWrapperFunc(CheckCookieValid)(c)
+		CheckCookieValid(c)
 	} else {
 		c.Next()
 	}

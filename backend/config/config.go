@@ -23,6 +23,7 @@ var (
 	PalaceCode      string
 	ThumbnailPath   string
 	ThumbnailPrefix string
+	AvatarPath      string
 	NoAccessPhoto   string
 	DBPath          string
 	DBRetryTime     int
@@ -46,6 +47,7 @@ const (
 const (
 	DefaultPath          = "images"
 	DefaultThumbnailPath = "thumbnails"
+	DefaultAvatarPath    = "avatars"
 	DefaultSize          = 1024
 	DefaultOutput        = "photos.json"
 	DefaultPrefix        = "/images"
@@ -66,6 +68,7 @@ func InitConfig() {
 	PalaceCode = loader.Get("PalaceCode").MustString(DefaultCode)
 	ThumbnailPath = loader.Get("ThumbnailPath").MustString(DefaultThumbnailPath)
 	ThumbnailPrefix = loader.Get("ThumbnailPrefix").MustString(DefaultThumbnail)
+	AvatarPath = loader.Get("AvatarPath").MustString(DefaultAvatarPath)
 	DBPath = loader.Get("DBPath").MustString(DefaultDB)
 	DBRetryTime = loader.Get("DBRetryTime").MustInt(DefaultRetryTime)
 	DBMaxRetry = loader.Get("DBMaxRetry").MustInt(DefaultMaxRetry)

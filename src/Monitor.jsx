@@ -21,7 +21,7 @@ import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { apiUploadImages } from "./api/images.js";
 import { apiGetUser } from "./api/user.js";
-import { clearPalaceCode, getPrivilege, isAdmin } from "./util.js";
+import { clearPalaceCode, getAvatarUrl, getPrivilege, isAdmin } from "./util.js";
 import { apiStorage } from "./api/storage.js";
 
 const Monitor = () => {
@@ -162,16 +162,16 @@ const Monitor = () => {
         <Card title={"Palace Monitor"}>
           {/*入口功能负责展示当前登录的用户信息以及其他管理页面的入口*/}
           <Card title={"User Info"}>
-            <Flex justify="space-between" align="center">
+            <Flex justify="space-between" align="center" wrap={true}>
               <Space size={"large"}>
                 {user?.name && user?.avatar ? (
                   <Avatar
-                    size={{ xs: 32, sm: 48, md: 64, lg: 72, xl: 96, xxl: 100 }}
-                    src={user.avatar}
+                    size={{ xs: 64, sm: 72, md: 96, lg: 128, xl: 196, xxl: 256 }}
+                    src={getAvatarUrl(user.avatar)}
                   />
                 ) : (
                   <Avatar
-                    size={{ xs: 32, sm: 48, md: 64, lg: 72, xl: 96, xxl: 100 }}
+                    size={{ xs: 64, sm: 72, md: 96, lg: 128, xl: 196, xxl: 256 }}
                     style={{ backgroundColor: "#823e9c" }}
                     icon={<UserOutlined />}
                   />

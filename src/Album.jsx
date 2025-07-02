@@ -191,9 +191,9 @@ const Album = () => {
             </Space>
           }
         >
-          <a key="list-hide" title="隐藏相册" style={{ fontSize: "1.05rem" }}>
+          <Button type={'text'} key="list-hide" title="隐藏相册">
             Hide
-          </a>
+          </Button>
         </Popover>
       );
     }
@@ -210,9 +210,9 @@ const Album = () => {
         }}
         onConfirm={() => hideAlbum(item?.id, 0)}
       >
-        <a key="list-unhide" title="取消隐藏" style={{ fontSize: "1.05rem" }}>
+        <Button type={'text'} key="list-unhide" title="取消隐藏" >
           Unhide
-        </a>
+        </Button>
       </Popconfirm>
     );
   };
@@ -220,21 +220,21 @@ const Album = () => {
     if (!isAdmin(privilege)) {
       return [
         <NavLink to={`/album/${item.id}`} key="list-open">
-          <a style={{ fontSize: "1.05rem" }}>Open</a>
+          <Button type={'text'}>Open</Button>
         </NavLink>,
       ];
     }
     return [
       <NavLink to={`/album/${item.id}`} key="list-open">
-        <a style={{ fontSize: "1.05rem" }}>Open</a>
+        <Button type={'text'}>Open</Button>
       </NavLink>,
-      <a
+      <Button
+        type={'text'}
         key="list-edit"
         onClick={() => openEditAlbum(item)}
-        style={{ fontSize: "1.05rem" }}
       >
         Edit
-      </a>,
+      </Button>,
       hideBtn(item),
       <Popconfirm
         title={"确认删除"}
@@ -242,7 +242,7 @@ const Album = () => {
         placement={"bottom"}
         onConfirm={() => handleRemoveAlbum(item)}
       >
-        <a style={{ fontSize: "1.05rem" }}>Delete</a>
+        <Button type={'text'}>Delete</Button>
       </Popconfirm>,
     ];
   };
