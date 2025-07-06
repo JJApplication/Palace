@@ -12,7 +12,7 @@ const apiGetRecycleImageList = () => {
 };
 
 const apiRecycleImage = (data) => {
-  return fetch(fmtUrl("/api/image/recycle"), {
+  return fetch(fmtUrl("/api/image/recycle/delete"), {
     headers: {
       token: getPalaceCode(),
     },
@@ -23,4 +23,16 @@ const apiRecycleImage = (data) => {
   });
 };
 
-export { apiGetRecycleImageList, apiRecycleImage };
+const apiRestoreImage = (data) => {
+  return fetch(fmtUrl("/api/image/recycle/restore"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  });
+};
+
+export { apiGetRecycleImageList, apiRecycleImage, apiRestoreImage };

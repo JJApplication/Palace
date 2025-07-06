@@ -264,6 +264,26 @@ func (i *ImageService) Recycle(ids []string) error {
 	return err
 }
 
+// Restore 回收恢复图片 传入图片的UUID
+func (i *ImageService) Restore(ids []string) error {
+	var images []model.Image
+	if err := db.DB.Model(&model.Image{}).Where("delete_flag = ?", 1).Where("uuid IN ?", ids).Find(&images).Error; err != nil {
+		log.Logger.ErrorF("get image list error: %s", err.Error())
+		return err
+	}
+	var err error
+	for _, image := range images {
+		err = db.DB.Model(&model.Image{}).Where("uuid = ?", image.UUID).Updates(map[string]interface{}{
+			"delete_flag": 0,
+		}).Error
+		if err != nil {
+			log.Logger.ErrorF("restore image [%s] error: %s", image.UUID, err.Error())
+			return err
+		}
+	}
+	return err
+}
+
 func (i *ImageService) Modify(image response.ImageRes) error {
 	updateMap := map[string]interface{}{
 		"name":          image.Name,

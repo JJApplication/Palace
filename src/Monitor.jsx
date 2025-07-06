@@ -243,7 +243,9 @@ const Monitor = () => {
               </Button>
               <Button icon={<ThunderboltOutlined />}>upload livephoto</Button>
               <Button icon={<TruckOutlined />}>export packs</Button>
-              <Button icon={<RestOutlined />}>recycle</Button>
+              <NavLink to={'/monitor/image'}>
+                <Button icon={<RestOutlined />}>recycle</Button>
+              </NavLink>
               <input
                 ref={ref}
                 type="file"

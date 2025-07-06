@@ -98,6 +98,25 @@ func (i *ImageController) Recycle(c *gin.Context) {
 	ctx.ResponseREST(200, response.JSON{})
 }
 
+func (i *ImageController) Restore(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	var ids []string
+	if err := c.ShouldBindJSON(&ids); err != nil {
+		log.Logger.ErrorF("bind json error: %s", err.Error())
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	if err := service.ImageServiceApp.Restore(ids); err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	ctx.ResponseREST(200, response.JSON{})
+}
+
 func (i *ImageController) Modify(c *gin.Context) {
 	ctx := http.Context{Context: c}
 	var image response.ImageRes

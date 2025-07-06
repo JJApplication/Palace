@@ -48,21 +48,22 @@ func Start() {
 	// 按逻辑分组
 	imageGroup := server.Group("/api/image")
 	{
-		imageGroup.Handle(http.GET, "/count", controller.ImageControllerApp.Count)                     // 图片总数
-		imageGroup.Handle(http.GET, "/list", controller.ImageControllerApp.List)                       // 图片列表
-		imageGroup.Handle(http.GET, "/info", controller.ImageControllerApp.Info)                       // 图片信息
-		imageGroup.Handle(http.POST, "/upload", CheckLogin, controller.ImageControllerApp.Upload)      // 上传图片
-		imageGroup.Handle(http.GET, "/recycle", CheckLogin, controller.ImageControllerApp.RecycleList) // 获取回收站图片列表
-		imageGroup.Handle(http.POST, "/recycle", CheckLogin, controller.ImageControllerApp.Recycle)    // 删除回收站图片列表
-		imageGroup.Handle(http.POST, "/hidden", CheckLogin, controller.ImageControllerApp.Hidden)      // 隐藏|取消隐藏图片
-		imageGroup.Handle(http.POST, "/modify", CheckLogin, controller.ImageControllerApp.Modify)      // 修改图片信息
-		imageGroup.Handle(http.POST, "/delete", CheckLogin, controller.ImageControllerApp.Delete)      // 删除图片
-		imageGroup.Handle(http.POST, "/tag/modify", CheckLogin, controller.ImageControllerApp.Upload)  // 编辑图片的标签
-		imageGroup.Handle(http.POST, "/tag/delete", CheckLogin, controller.ImageControllerApp.Upload)  // 编辑图片的标签
-		imageGroup.Handle(http.POST, "/tag/add", CheckLogin, controller.ImageControllerApp.Upload)     // 编辑图片的标签
-		imageGroup.Handle(http.POST, "/cate/modify", CheckLogin, controller.ImageControllerApp.Upload) // 编辑图片的分类相册
-		imageGroup.Handle(http.POST, "/cate/delete", CheckLogin, controller.ImageControllerApp.Upload) // 编辑图片的分类相册
-		imageGroup.Handle(http.POST, "/cate/add", CheckLogin, controller.ImageControllerApp.AddCate)   // 编辑图片的分类相册
+		imageGroup.Handle(http.GET, "/count", controller.ImageControllerApp.Count)                          // 图片总数
+		imageGroup.Handle(http.GET, "/list", controller.ImageControllerApp.List)                            // 图片列表
+		imageGroup.Handle(http.GET, "/info", controller.ImageControllerApp.Info)                            // 图片信息
+		imageGroup.Handle(http.POST, "/upload", CheckLogin, controller.ImageControllerApp.Upload)           // 上传图片
+		imageGroup.Handle(http.GET, "/recycle", CheckLogin, controller.ImageControllerApp.RecycleList)      // 获取回收站图片列表
+		imageGroup.Handle(http.POST, "/recycle/delete", CheckLogin, controller.ImageControllerApp.Recycle)  // 删除回收站图片列表
+		imageGroup.Handle(http.POST, "/recycle/restore", CheckLogin, controller.ImageControllerApp.Restore) // 恢复回收站图片列表
+		imageGroup.Handle(http.POST, "/hidden", CheckLogin, controller.ImageControllerApp.Hidden)           // 隐藏|取消隐藏图片
+		imageGroup.Handle(http.POST, "/modify", CheckLogin, controller.ImageControllerApp.Modify)           // 修改图片信息
+		imageGroup.Handle(http.POST, "/delete", CheckLogin, controller.ImageControllerApp.Delete)           // 删除图片
+		imageGroup.Handle(http.POST, "/tag/modify", CheckLogin, controller.ImageControllerApp.Upload)       // 编辑图片的标签
+		imageGroup.Handle(http.POST, "/tag/delete", CheckLogin, controller.ImageControllerApp.Upload)       // 编辑图片的标签
+		imageGroup.Handle(http.POST, "/tag/add", CheckLogin, controller.ImageControllerApp.Upload)          // 编辑图片的标签
+		imageGroup.Handle(http.POST, "/cate/modify", CheckLogin, controller.ImageControllerApp.Upload)      // 编辑图片的分类相册
+		imageGroup.Handle(http.POST, "/cate/delete", CheckLogin, controller.ImageControllerApp.Upload)      // 编辑图片的分类相册
+		imageGroup.Handle(http.POST, "/cate/add", CheckLogin, controller.ImageControllerApp.AddCate)        // 编辑图片的分类相册
 
 		imageGroup.Handle(http.GET, "/storage", CheckLogin, controller.ImageControllerApp.Storage) // 存储详情
 	}

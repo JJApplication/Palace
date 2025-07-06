@@ -1,0 +1,15 @@
+.photo-list {
+}
+
+.photo-list .float-select {
+    display: flex;
+    width: 100%;
+    position: relative;
+    justify-content: center;
+    align-items: center;
+}
+
+.photo-list .float-select .float-select-card {
+    position: fixed;
+    bottom: 4rem;
+}

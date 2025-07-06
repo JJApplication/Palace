@@ -1,6 +1,7 @@
 // 图片流组件
 import {
   Button,
+  Card,
   Form,
   Input,
   Modal,
@@ -8,7 +9,7 @@ import {
   Popover,
   Select,
   Space,
-  Tag,
+  Tag, Tooltip
 } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { RowsPhotoAlbum } from "react-photo-album";
@@ -27,17 +28,19 @@ import {
   apiImageAddCate,
 } from "../api/images.js";
 import {
-  AppstoreAddOutlined,
+  AppstoreAddOutlined, CloseOutlined,
   DeleteOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
   FlagOutlined,
-  InfoCircleOutlined,
+  InfoCircleOutlined, RollbackOutlined,
   SyncOutlined,
-  TagOutlined,
+  TagOutlined
 } from "@ant-design/icons";
-import { apiRecycleImage } from "../api/recycle.js";
+import { apiRecycleImage, apiRestoreImage } from "../api/recycle.js";
 import HiddenCover from "./HiddenCover.jsx";
+import SelectIcon from "./SelectIcon.jsx";
+import "./PhotoList.css";
 
 const PhotoType = {
   gallery: "gallery",
@@ -70,11 +73,27 @@ const PhotoList = ({
   const [categories, setCategories] = useState([]); // 仅在首次加载，用于缓存，增加按钮刷新
   const [tags, setTags] = useState([]);
 
+  const [selectPhotos, setSelectPhotos] = useState([]);
+  const [selectCount, setSelectCount] = useState(0);
+
   useEffect(() => {
     if (isAdmin(privilege)) {
       getAllCategories();
     }
   }, [privilege]);
+
+  useEffect(() => {
+    setSelectPhotos(
+      photos.map((photo) => ({
+        ...photo,
+        selected: false,
+      })),
+    );
+  }, [photos]);
+
+  useEffect(() => {
+    setSelectCount(selectPhotos.filter((p) => p.selected).length || 0);
+  }, [selectPhotos]);
 
   const getLightboxList = (photoList) => {
     return photoList.map((p) => {
@@ -126,10 +145,10 @@ const PhotoList = ({
     const msg = hidden > 0 ? "隐藏" : "取消隐藏";
     apiHideImage(data).then((res) => {
       if (res.ok) {
-        toast(`图片${msg}成功`, { position: 'bottom-right' });
+        toast(`图片${msg}成功`, { position: "bottom-right" });
         return;
       }
-      toast.error(`图片${msg}失败`, { position: 'bottom-right' });
+      toast.error(`图片${msg}失败`, { position: "bottom-right" });
     });
   };
 
@@ -140,10 +159,10 @@ const PhotoList = ({
     const data = { cover: thumbnail, id: Number(albumId) };
     apiSetAlbumCover(data).then((res) => {
       if (res.ok) {
-        toast("封面设置成功", { position: 'bottom-right' });
+        toast("封面设置成功", { position: "bottom-right" });
         return;
       }
-      toast.error("封面设置失败", { position: 'bottom-right' });
+      toast.error("封面设置失败", { position: "bottom-right" });
     });
   };
 
@@ -152,14 +171,14 @@ const PhotoList = ({
     apiDeleteImage(data)
       .then((res) => {
         if (res.ok) {
-          toast("delete success", { position: 'bottom-right' });
+          toast("delete success", { position: "bottom-right" });
           photosCb ? photosCb() : null;
         } else {
-          toast.error("delete failed", { position: 'bottom-right' });
+          toast.error("delete failed", { position: "bottom-right" });
         }
       })
       .catch(() => {
-        toast.error("delete failed",{ position: 'bottom-right' });
+        toast.error("delete failed", { position: "bottom-right" });
       })
       .finally(() => {
         setShowDel(false);
@@ -170,15 +189,57 @@ const PhotoList = ({
     apiRecycleImage([currentPhoto.uuid])
       .then((res) => {
         if (res.ok) {
-          toast("delete success", { position: 'bottom-right' });
+          toast("delete success", { position: "bottom-right" });
           ref?.current?.close();
           photosCb ? photosCb() : null;
         } else {
-          toast.error("delete failed", { position: 'bottom-right' });
+          toast.error("delete failed", { position: "bottom-right" });
         }
       })
       .catch(() => {
-        toast.error("delete failed", { position: 'bottom-right' });
+        toast.error("delete failed", { position: "bottom-right" });
+      })
+      .finally(() => {
+        setShowDelReal(false);
+      });
+  };
+
+  const recyclePhotoMult = () => {
+    const selectedList = selectPhotos.filter((p) => p.selected)
+    apiRecycleImage(selectedList.map((p) => p.uuid))
+      .then((res) => {
+        if (res.ok) {
+          toast("delete success", { position: "bottom-right" });
+          ref?.current?.close();
+          photosCb ? photosCb() : null;
+        } else {
+          toast.error("delete failed", { position: "bottom-right" });
+        }
+      })
+      .catch(() => {
+        toast.error("delete failed", { position: "bottom-right" });
+      })
+  };
+
+  const clearSelected = () => {
+    const list = selectPhotos.filter((p) => p)
+    list.forEach((p) => p.selected = false);
+    setSelectPhotos(list);
+  }
+  const restorePhotoMult = () => {
+    const selectedList = selectPhotos.filter((p) => p.selected)
+    apiRestoreImage(selectedList.map((p) => p.uuid))
+      .then((res) => {
+        if (res.ok) {
+          toast("restore success", { position: "bottom-right" });
+          ref?.current?.close();
+          photosCb ? photosCb() : null;
+        } else {
+          toast.error("restore failed", { position: "bottom-right" });
+        }
+      })
+      .catch(() => {
+        toast.error("restore failed", { position: "bottom-right" });
       })
       .finally(() => {
         setShowDelReal(false);
@@ -198,13 +259,13 @@ const PhotoList = ({
     apiImageAddCate(data)
       .then((res) => {
         if (res.ok) {
-          toast("成功添加到相册", { position: 'bottom-right' });
+          toast("成功添加到相册", { position: "bottom-right" });
           return;
         }
-        toast.error("添加到相册失败", { position: 'bottom-right' });
+        toast.error("添加到相册失败", { position: "bottom-right" });
       })
       .catch(() => {
-        toast.error("添加到相册失败", { position: 'bottom-right' });
+        toast.error("添加到相册失败", { position: "bottom-right" });
       })
       .finally(() => {
         formCate.resetFields();
@@ -421,7 +482,7 @@ const PhotoList = ({
   };
 
   return (
-    <>
+    <div className={"photo-list"}>
       <RowsPhotoAlbum
         breakpoints={[1440, 1200, 1080, 640, 384, 256, 128, 96, 64, 48]}
         padding={5}
@@ -433,14 +494,29 @@ const PhotoList = ({
           if (containerWidth <= 1200) return 5;
           return 6;
         }}
-        photos={photos}
+        photos={photoType === PhotoType.recycle ? selectPhotos : photos}
         onClick={({ index }) => {
           setIndex(index);
         }}
         render={{
-          extras: (_, { photo }) => {
+          extras: (_, { photo, index }) => {
             if (!isAdmin(privilege) && photo && photo?.need_hide >= 1) {
               return <HiddenCover type="image" />;
+            } else if (isAdmin(privilege) && photoType === PhotoType.recycle) {
+              return (
+                <SelectIcon
+                  selected={photo?.selected || false}
+                  onClick={(e) => {
+                    setSelectPhotos((prevPhotos) => {
+                      const newPhotos = [...prevPhotos];
+                      newPhotos[index].selected = !photo.selected;
+                      return newPhotos;
+                    });
+                    e.preventDefault();
+                    e.stopPropagation();
+                  }}
+                />
+              );
             }
           },
         }}
@@ -535,7 +611,13 @@ const PhotoList = ({
             label={
               <Space size={"small"}>
                 <span>Category</span>
-                <Button icon={<SyncOutlined />} shape="circle" type="primary" size="small" onClick={() => getAllCategories(true)} />
+                <Button
+                  icon={<SyncOutlined />}
+                  shape="circle"
+                  type="primary"
+                  size="small"
+                  onClick={() => getAllCategories(true)}
+                />
               </Space>
             }
             name="cate"
@@ -599,7 +681,28 @@ const PhotoList = ({
           </Form.Item>
         </Form>
       </Modal>
-    </>
+      {photoType === PhotoType.recycle && selectCount > 0 && (
+        <div className={"float-select"}>
+          <Card className={"float-select-card"}>
+            <Space size={'large'}>
+              <Space size={'small'}>
+                <Tag color={"blue"}>Photo Select</Tag>
+                <span style={{ fontSize: "1.25rem" }}>{selectCount}</span>
+              </Space>
+              <Tooltip title='恢复图片'>
+                <Button icon={<RollbackOutlined />} shape={'circle'} type={'primary'} onClick={restorePhotoMult}></Button>
+              </Tooltip>
+              <Tooltip title='删除图片'>
+                <Button icon={<DeleteOutlined />} shape={'circle'} danger type={'primary'} onClick={recyclePhotoMult}></Button>
+              </Tooltip>
+              <Tooltip title='清空选择'>
+                <Button icon={<CloseOutlined />} shape={'circle'} variant="solid" color={'orange'} onClick={clearSelected}></Button>
+              </Tooltip>
+            </Space>
+          </Card>
+        </div>
+      )}
+    </div>
   );
 };
 
