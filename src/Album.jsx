@@ -1,6 +1,6 @@
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   Button,
   Flex,
@@ -31,9 +31,9 @@ import {
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import { NavLink } from "react-router";
-import { apiGetUser } from "./api/user.js";
-import { formatImageUrl, getPrivilege, isAdmin, noCover } from "./util.js";
+import { formatImageUrl, isAdmin, noCover } from "./util.js";
 import HiddenCover from "./components/HiddenCover.jsx";
+import UserContext from "./components/UserContext.jsx";
 
 const Album = () => {
   const [form] = Form.useForm();
@@ -41,11 +41,12 @@ const Album = () => {
 
   const [init, setInit] = useState(false);
   const [albums, setAlbums] = useState([]);
-  const [privilege, setPrivilege] = useState("guest");
   const [addAlbumInfo, setAddAlbumInfo] = useState({});
   const [editAlbumInfo, setEditAlbumInfo] = useState({});
   const [showAddAlbum, setShowAddAlbum] = useState(false);
   const [showEditAlbum, setShowEditAlbum] = useState(false);
+
+  const { privilege } = useContext(UserContext);
 
   const getAlbums = () => {
     setInit(false);
@@ -64,24 +65,8 @@ const Album = () => {
       });
   };
 
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
-
   useEffect(() => {
     getAlbums();
-  }, []);
-
-  useEffect(() => {
-    getUser();
   }, []);
 
   const handleAddAlbum = async () => {
@@ -191,7 +176,7 @@ const Album = () => {
             </Space>
           }
         >
-          <Button type={'text'} key="list-hide" title="隐藏相册">
+          <Button type={"text"} key="list-hide" title="隐藏相册">
             Hide
           </Button>
         </Popover>
@@ -210,7 +195,7 @@ const Album = () => {
         }}
         onConfirm={() => hideAlbum(item?.id, 0)}
       >
-        <Button type={'text'} key="list-unhide" title="取消隐藏" >
+        <Button type={"text"} key="list-unhide" title="取消隐藏">
           Unhide
         </Button>
       </Popconfirm>
@@ -220,19 +205,15 @@ const Album = () => {
     if (!isAdmin(privilege)) {
       return [
         <NavLink to={`/album/${item.id}`} key="list-open">
-          <Button type={'text'}>Open</Button>
+          <Button type={"text"}>Open</Button>
         </NavLink>,
       ];
     }
     return [
       <NavLink to={`/album/${item.id}`} key="list-open">
-        <Button type={'text'}>Open</Button>
+        <Button type={"text"}>Open</Button>
       </NavLink>,
-      <Button
-        type={'text'}
-        key="list-edit"
-        onClick={() => openEditAlbum(item)}
-      >
+      <Button type={"text"} key="list-edit" onClick={() => openEditAlbum(item)}>
         Edit
       </Button>,
       hideBtn(item),
@@ -242,7 +223,7 @@ const Album = () => {
         placement={"bottom"}
         onConfirm={() => handleRemoveAlbum(item)}
       >
-        <Button type={'text'}>Delete</Button>
+        <Button type={"text"}>Delete</Button>
       </Popconfirm>,
     ];
   };
@@ -253,7 +234,7 @@ const Album = () => {
         <a href="#" style={{ fontSize: "1.5rem" }}>
           {item.name}
         </a>
-      )
+      );
     }
     return (
       <a href={`/album/${item.id}`} style={{ fontSize: "1.5rem" }}>
@@ -267,7 +248,11 @@ const Album = () => {
     }
     return (
       <NavLink to={`/album/${item.id}`} key="nav-album">
-        <img width={256} alt="logo" src={formatImageUrl(item.cover) || noCover()} />
+        <img
+          width={256}
+          alt="logo"
+          src={formatImageUrl(item.cover) || noCover()}
+        />
       </NavLink>
     );
   };

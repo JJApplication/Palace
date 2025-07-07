@@ -71,7 +71,7 @@ func (s *TaskService) SyncHiddenImages() error {
 		return err
 	}
 	go func(taskID string) {
-		InitHiddenImages()
+		RefreshHiddenImages()
 		s.completeTask(taskID)
 	}(task.TaskID)
 

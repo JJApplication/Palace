@@ -1,11 +1,40 @@
 import "./App.css";
 import "./font.css";
 import router from "./router/router.jsx";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import { ConfigProvider, theme } from "antd";
 import { RouterProvider } from "react-router";
+import { useEffect, useState } from "react";
+import { apiGetUser } from "./api/user.js";
+import { getPalaceCode, getPrivilege } from "./util.js";
+import UserContext from "./components/UserContext.jsx";
 
 function App() {
+  const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
+  const [privilege, setPrivilege] = useState("guest");
+
+  const value = { user, privilege };
+
+  const getUser = () => {
+    // 简化请求，如果没有token不请求
+    if (!getPalaceCode() || getPalaceCode() === "") {
+      return;
+    }
+    apiGetUser().then((res) => {
+      if (!res.ok) {
+        toast.error("获取用户信息失败");
+        return;
+      }
+      res.json().then((data) => {
+        setUser(data?.data || {});
+        setPrivilege(getPrivilege(data?.data.privilege));
+      });
+    });
+  };
+
+  useEffect(() => {
+    getUser();
+  }, []);
   return (
     <>
       <ConfigProvider
@@ -13,7 +42,9 @@ function App() {
           algorithm: theme.darkAlgorithm,
         }}
       >
-        <RouterProvider router={router}></RouterProvider>
+        <UserContext.Provider value={value}>
+          <RouterProvider router={router}></RouterProvider>
+        </UserContext.Provider>
       </ConfigProvider>
       <ToastContainer
         position="top-center"

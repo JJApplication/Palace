@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "react-photo-album/rows.css";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
@@ -8,30 +8,17 @@ import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
 import { apiGetRecycleImageList } from "./api/recycle.js";
 import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
-import './styles/GalleryRecycle.css';
-import {apiGetUser} from "./api/user.js";
-import { getImageUrl, getPrivilege } from "./util.js";
+import "./styles/GalleryRecycle.css";
+import { getImageUrl } from "./util.js";
+import UserContext from "./components/UserContext.jsx";
 
 const GalleryRecycle = () => {
   const [photos, setPhotos] = useState([]);
-  const [privilege, setPrivilege] = useState("guest");
+  const { privilege } = useContext(UserContext);
 
   useEffect(() => {
-    getUser();
     getPhotos();
   }, []);
-
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
 
   const getPhotos = () => {
     apiGetRecycleImageList()
@@ -39,8 +26,8 @@ const GalleryRecycle = () => {
         r.json().then((res) => {
           const photosList = res.data.map((p) => {
             return {
-              image: getImageUrl('/static/image/', p.uuid, p.ext),
-              src: getImageUrl('/static/thumbnail/', p.uuid, p.ext),
+              image: getImageUrl("/static/image/", p.uuid, p.ext),
+              src: getImageUrl("/static/thumbnail/", p.uuid, p.ext),
               width: p.width,
               height: p.height,
               ...p,
@@ -58,7 +45,12 @@ const GalleryRecycle = () => {
     <div>
       <Header />
       <main className="recycle">
-        <PhotoList photos={photos} photoType={PhotoType.recycle} photosCb={getPhotos} privilege={privilege} />
+        <PhotoList
+          photos={photos}
+          photoType={PhotoType.recycle}
+          photosCb={getPhotos}
+          privilege={privilege}
+        />
         <p style={{ textAlign: "center", marginBottom: 0 }}>
           Like more & Love more
         </p>

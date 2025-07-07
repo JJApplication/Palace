@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import "react-photo-album/rows.css";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
@@ -7,26 +7,23 @@ import logo from "./assets/logo.gif";
 import { useNavigate } from "react-router";
 import Footer from "./components/Footer.jsx";
 import Header from "./components/Header.jsx";
-import {
-  apiGetImageList,
-} from "./api/images.js";
-import {PhotoList, PhotoType} from "./components/PhotoList.jsx";
-import './styles/Gallery.css';
-import {apiGetUser} from "./api/user.js";
-import {toast} from "react-toastify";
-import { getImageUrl, getPrivilege } from "./util.js";
+import { apiGetImageList } from "./api/images.js";
+import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
+import "./styles/Gallery.css";
+import { getImageUrl } from "./util.js";
+import UserContext from "./components/UserContext.jsx";
 
 const Gallery = () => {
   const nav = useNavigate();
   const [photos, setPhotos] = useState([]);
   const [init, setInit] = useState(false);
   const [initCode, setInitCode] = useState("#");
-  const [privilege, setPrivilege] = useState("guest");
+
+  const { privilege } = useContext(UserContext);
 
   let tick = null;
 
   useEffect(() => {
-    getUser();
     getPhotos();
     initCallback(initCode);
     return () => clearInterval(tick);
@@ -59,27 +56,15 @@ const Gallery = () => {
     }, 200);
   };
 
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
-
   const getPhotos = () => {
     apiGetImageList()
       .then((r) => {
         r.json().then((res) => {
-          getImageUrl()
+          getImageUrl();
           const photosList = res.data.map((p) => {
             return {
-              image: getImageUrl('/static/image/', p.uuid, p.ext),
-              src: getImageUrl('/static/thumbnail/', p.uuid, p.ext),
+              image: getImageUrl("/static/image/", p.uuid, p.ext),
+              src: getImageUrl("/static/thumbnail/", p.uuid, p.ext),
               width: p.width,
               height: p.height,
               ...p,
@@ -116,7 +101,7 @@ const Gallery = () => {
         </div>
       )}
       <Header />
-      <div className={'gallery'}>
+      <div className={"gallery"}>
         <div
           style={{
             textAlign: "left",
@@ -141,7 +126,12 @@ const Gallery = () => {
             Life
           </span>
         </div>
-        <PhotoList photoType={PhotoType.gallery} photos={photos} photosCb={getPhotos} privilege={privilege}/>
+        <PhotoList
+          photoType={PhotoType.gallery}
+          photos={photos}
+          photosCb={getPhotos}
+          privilege={privilege}
+        />
         <p style={{ textAlign: "center", marginBottom: 0 }}>
           Like more & Love more
         </p>

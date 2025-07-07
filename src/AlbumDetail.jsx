@@ -1,7 +1,7 @@
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import { useNavigate, useParams } from "react-router";
-import { useEffect, useRef, useState } from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import { apiGetAlbumImageList, apiGetAlbumInfo } from "./api/album.js";
 import "./styles/AlbumDetail.css";
 import {
@@ -28,12 +28,12 @@ import {
   PictureOutlined,
 } from "@ant-design/icons";
 
-import { getDate, getImageUrl, getPrivilege, isAdmin } from "./util.js";
+import { getDate, getImageUrl, isAdmin } from "./util.js";
 
 import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
-import { apiGetUser } from "./api/user.js";
 import { toast } from "react-toastify";
 import { apiUploadImages } from "./api/images.js";
+import UserContext from "./components/UserContext.jsx";
 
 const AlbumDetail = () => {
   const { Text, Paragraph } = Typography;
@@ -44,7 +44,6 @@ const AlbumDetail = () => {
 
   const [info, setInfo] = useState({});
   const [photos, setPhotos] = useState([]);
-  const [privilege, setPrivilege] = useState("guest");
   const [showUpload, setShowUpload] = useState(false);
   const [status, setStatus] = useState(0); // 普通上传的状态
   const [uploadStatus, setUploadStatus] = useState({
@@ -55,6 +54,8 @@ const AlbumDetail = () => {
     complete: false,
     files: [], // 已经处理的文件{file, done}
   }); // 图片上传队列状态
+
+  const { privilege } = useContext(UserContext);
 
   const resetUploadStatus = () => {
     setUploadStatus({
@@ -87,22 +88,6 @@ const AlbumDetail = () => {
 
   useEffect(() => {
     getAlbumInfo();
-  }, []);
-
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
-
-  useEffect(() => {
-    getUser();
   }, []);
 
   const getPhotosInAlbum = (params) => {
@@ -200,7 +185,7 @@ const AlbumDetail = () => {
       files.push({ name: file.name, done: false, failed: false });
     }
     setUploadStatus({
-      start: false,
+      start: true,
       total: files.length,
       done: 0,
       failed: 0,

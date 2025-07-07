@@ -195,7 +195,7 @@ const Task = () => {
             columns={columns}
             dataSource={tasks}
             size={"small"}
-            style={{ maxHeight: "320px", overflowY: "auto" }}
+            style={{ maxHeight: "320px", width: 'auto', overflowY: "auto" }}
             pagination={false}
           />
           <Divider />

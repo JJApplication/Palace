@@ -1,47 +1,41 @@
 import Header from "../components/Header.jsx";
 import Footer from "../components/Footer.jsx";
-import { Avatar, Button, Card, Divider, Flex, Form, Input, Modal, Space, Tag } from "antd";
 import {
-  CheckSquareOutlined, LoginOutlined,
+  Avatar,
+  Button,
+  Card,
+  Flex,
+  Form,
+  Input,
+  Modal,
+  Space,
+  Tag,
+} from "antd";
+import {
+  CheckSquareOutlined,
+  LoginOutlined,
   LogoutOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { useEffect, useRef, useState } from "react";
-import { apiGetUser, apiResetUser, apiUpdateUser, apiUploadAvatar } from "../api/user.js";
+import { useContext, useRef, useState } from "react";
+import { apiResetUser, apiUpdateUser, apiUploadAvatar } from "../api/user.js";
 import { toast } from "react-toastify";
-import { clearPalaceCode, getAvatarUrl, getPrivilege, isSuperAdmin } from "../util.js";
+import { clearPalaceCode, getAvatarUrl, isSuperAdmin } from "../util.js";
 import { useNavigate } from "react-router";
 import "../styles/User.css";
-import {apiLogout} from "../api/login.js";
+import { apiLogout } from "../api/login.js";
+import UserContext from "../components/UserContext.jsx";
 
 const User = () => {
   const nav = useNavigate();
   const [formReset] = Form.useForm();
   const ref = useRef(null);
 
-  const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
-  const [currentAvatar, setCurrentAvatar] = useState('');
-  const [privilege, setPrivilege] = useState('guest');
-  const [showReset, setShowReset] = useState(false)
-  const [showUpload, setShowUpload] = useState(false)
+  const [currentAvatar, setCurrentAvatar] = useState("");
+  const [showReset, setShowReset] = useState(false);
+  const [showUpload, setShowUpload] = useState(false);
 
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setUser(data?.data || {});
-        setCurrentAvatar(data?.data?.avatar);
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
-
-  useEffect(() => {
-    getUser();
-  }, []);
+  const { user, privilege } = useContext(UserContext);
 
   const renderPrivilege = (p) => {
     switch (p) {
@@ -68,7 +62,7 @@ const User = () => {
     apiLogout().then(() => {
       toast("logout successfully.");
       nav("/login");
-    })
+    });
   };
 
   const reset = (e) => {
@@ -94,16 +88,18 @@ const User = () => {
 
   const updateUser = () => {
     const data = formReset.getFieldsValue();
-    apiUpdateUser(data).then(res => {
-      if (res.ok) {
-        toast('用户信息更新成功')
-        return;
-      }
-      toast.error('用户信息更新失败')
-    }).finally(() => {
-      formReset.resetFields();
-    })
-  }
+    apiUpdateUser(data)
+      .then((res) => {
+        if (res.ok) {
+          toast("用户信息更新成功");
+          return;
+        }
+        toast.error("用户信息更新失败");
+      })
+      .finally(() => {
+        formReset.resetFields();
+      });
+  };
 
   const uploadAvatar = (e) => {
     if (e.target.files && e.target.files.length <= 0) {
@@ -111,40 +107,48 @@ const User = () => {
     }
     const file = e.target.files[0];
     if (file?.size > 1024 * 1024) {
-      toast.warn('头像文件大小需要小于1mb')
+      toast.warn("头像文件大小需要小于1mb");
       return;
     }
     const formData = new FormData();
     formData.append("file", file);
     apiUploadAvatar(formData).then((res) => {
       if (res.ok) {
-        toast('头像上传成功');
-        res.json().then(data => {
+        toast("头像上传成功");
+        res.json().then((data) => {
           console.log(data);
           setCurrentAvatar(data?.data);
-        })
+        });
         return;
       }
-      toast.error('头像上传失败');
-    })
-  }
+      toast.error("头像上传失败");
+    });
+  };
 
   return (
     <>
       <Header />
       <main className="user">
         <Card title={"User Info"}>
-          <Flex justify="space-between" align="center" style={{ maxWidth: "640px", margin: "0 auto" }}>
+          <Flex
+            justify="space-between"
+            align="center"
+            style={{ maxWidth: "640px", margin: "0 auto" }}
+          >
             <Space size={"large"}>
               {user?.name && user?.avatar ? (
                 <Avatar
-                  onClick={() => {setShowUpload(true)}}
+                  onClick={() => {
+                    setShowUpload(true);
+                  }}
                   size={{ xs: 64, sm: 72, md: 96, lg: 128, xl: 196, xxl: 256 }}
                   src={getAvatarUrl(user.avatar)}
                 />
               ) : (
                 <Avatar
-                  onClick={() => {setShowUpload(true)}}
+                  onClick={() => {
+                    setShowUpload(true);
+                  }}
                   size={{ xs: 64, sm: 72, md: 96, lg: 128, xl: 196, xxl: 256 }}
                   style={{ backgroundColor: "#823e9c" }}
                   icon={<UserOutlined />}
@@ -156,23 +160,23 @@ const User = () => {
               {renderPrivilege(user.privilege)}
             </Space>
             {user?.name ? (
-                <Button
-                    icon={<LogoutOutlined />}
-                    onClick={() => {
-                      handleLogout();
-                    }}
-                >
-                  Logout
-                </Button>
+              <Button
+                icon={<LogoutOutlined />}
+                onClick={() => {
+                  handleLogout();
+                }}
+              >
+                Logout
+              </Button>
             ) : (
-                <Button
-                    icon={<LoginOutlined />}
-                    onClick={() => {
-                      nav("/login");
-                    }}
-                >
-                  Login
-                </Button>
+              <Button
+                icon={<LoginOutlined />}
+                onClick={() => {
+                  nav("/login");
+                }}
+              >
+                Login
+              </Button>
             )}
           </Flex>
           <Form
@@ -199,39 +203,43 @@ const User = () => {
             </Form.Item>
             <Space>
               <Button
-                  type="primary"
-                  htmlType="submit"
-                  icon={<CheckSquareOutlined />}
+                type="primary"
+                htmlType="submit"
+                icon={<CheckSquareOutlined />}
               >
                 Confirm
               </Button>
               {isSuperAdmin(privilege) && (
-                  <Button color={"danger"} variant="solid" onClick={() => setShowReset(true )}>
-                    Reset User
-                  </Button>
+                <Button
+                  color={"danger"}
+                  variant="solid"
+                  onClick={() => setShowReset(true)}
+                >
+                  Reset User
+                </Button>
               )}
             </Space>
           </Form>
         </Card>
         <Modal
-            title={'Reset user'}
-            open={showReset}
-            destroyOnClose={true}
-            footer={null}
-            bodyStyle={{ maxHeight: "640px" }}
-            onCancel={() => {
-              formReset.resetFields();
-              setShowReset(false);
-            }}
+          title={"Reset user"}
+          open={showReset}
+          destroyOnClose={true}
+          footer={null}
+          bodyStyle={{ maxHeight: "640px" }}
+          onCancel={() => {
+            formReset.resetFields();
+            setShowReset(false);
+          }}
         >
           <Form form={formReset}>
-            <Form.Item label={'username'} name='username'>
+            <Form.Item label={"username"} name="username">
               <Input />
             </Form.Item>
-            <Form.Item label={'password'} name='password'>
+            <Form.Item label={"password"} name="password">
               <Input.Password />
             </Form.Item>
-            <Button type={'primary'} onClick={updateUser} htmlType="submit">
+            <Button type={"primary"} onClick={updateUser} htmlType="submit">
               Submit
             </Button>
           </Form>
@@ -239,26 +247,39 @@ const User = () => {
         <Modal
           open={showUpload}
           destroyOnHidden={true}
-          onCancel={() => {setShowUpload(false)}}
+          onCancel={() => {
+            setShowUpload(false);
+          }}
           onOk={() => setShowUpload(false)}
         >
-          <Card title={'Upload A New Avatar'}>
+          <Card title={"Upload A New Avatar"}>
             <Space size={"large"}>
               {user?.name && user?.avatar ? (
                 <Avatar
-                  onClick={() => {setShowUpload(true)}}
+                  onClick={() => {
+                    setShowUpload(true);
+                  }}
                   size={{ xs: 72, sm: 96, md: 128, lg: 196, xl: 256, xxl: 384 }}
                   src={getAvatarUrl(currentAvatar)}
                 />
               ) : (
                 <Avatar
-                  onClick={() => {setShowUpload(true)}}
+                  onClick={() => {
+                    setShowUpload(true);
+                  }}
                   size={{ xs: 72, sm: 96, md: 128, lg: 196, xl: 256, xxl: 384 }}
                   style={{ backgroundColor: "#823e9c" }}
                   icon={<UserOutlined />}
                 />
               )}
-              <Button type={'primary'} onClick={() => {ref?.current?.click()}}>Upload</Button>
+              <Button
+                type={"primary"}
+                onClick={() => {
+                  ref?.current?.click();
+                }}
+              >
+                Upload
+              </Button>
             </Space>
             <input
               ref={ref}

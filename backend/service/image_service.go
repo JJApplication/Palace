@@ -46,6 +46,17 @@ func InitHiddenImages() {
 	}
 }
 
+// RefreshHiddenImages 刷新隐藏的图片
+func RefreshHiddenImages() {
+	HiddenImagesMap.Clear()
+	var images []model.Image
+	if err := db.DB.Model(&model.Image{}).Where("need_hide >= 1").Find(&images).Error; err == nil {
+		for _, image := range images {
+			HiddenImage(image.UUID)
+		}
+	}
+}
+
 func IsHidden(fileName string) bool {
 	fileName = strings.ToLower(fileName)
 	if _, ok := HiddenImagesMap.Load(fileName); ok {
@@ -118,7 +129,10 @@ func (i *ImageService) Upload(c *gin.Context, form *multipart.Form, cate string)
 			log.Logger.ErrorF("save image to db error: %s", err.Error())
 			return err
 		}
-		HiddenImage(imageId)
+
+		if isNeedHide > 0 {
+			HiddenImage(imageId)
+		}
 
 		// 相册的添加使用异步任务
 		go func() {

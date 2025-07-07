@@ -43,7 +43,7 @@ func Start() {
 	{
 		fileGroup.GET("/image/:path", AccessHidden, controller.StaticControllerApp.FileImage)
 		fileGroup.GET("/thumbnail/:path", AccessHidden, controller.StaticControllerApp.FileThumbnail)
-		fileGroup.GET("/avatar/:path", AccessHidden, controller.StaticControllerApp.FileAvatar)
+		fileGroup.GET("/avatar/:path", controller.StaticControllerApp.FileAvatar)
 	}
 	// 按逻辑分组
 	imageGroup := server.Group("/api/image")

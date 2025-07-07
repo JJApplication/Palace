@@ -2,10 +2,9 @@ import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
 import { Avatar, Button, Card, Col, Flex, Progress, Row, Space, Statistic, Tag } from "antd";
 import "./styles/Monitor.css";
-import { useEffect, useRef, useState } from "react";
+import {useContext, useEffect, useRef, useState} from "react";
 import { apiLogout } from "./api/login.js";
 import {
-  CloudUploadOutlined,
   InsertRowBelowOutlined,
   LoginOutlined,
   LogoutOutlined,
@@ -20,30 +19,18 @@ import {
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
 import { apiUploadImages } from "./api/images.js";
-import { apiGetUser } from "./api/user.js";
-import { clearPalaceCode, getAvatarUrl, getPrivilege, isAdmin } from "./util.js";
+import { clearPalaceCode, getAvatarUrl, isAdmin } from "./util.js";
 import { apiStorage } from "./api/storage.js";
+import Upload from "./components/Upload.jsx";
+import UserContext from "./components/UserContext.jsx";
 
 const Monitor = () => {
   const nav = useNavigate();
   const ref = useRef();
-  const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
   const [status, setStatus] = useState(0); // 上传状态
-  const [privilege, setPrivilege] = useState("guest");
   const [storage, setStorage] = useState({});
 
-  const getUser = () => {
-    apiGetUser().then((res) => {
-      if (!res.ok) {
-        toast.error("获取用户信息失败");
-        return;
-      }
-      res.json().then((data) => {
-        setUser(data?.data || {});
-        setPrivilege(getPrivilege(data?.data.privilege));
-      });
-    });
-  };
+  const { user, privilege } = useContext(UserContext);
 
   const getStorage = () => {
     if (isAdmin(privilege)) {
@@ -54,10 +41,6 @@ const Monitor = () => {
       })
     }
   }
-
-  useEffect(() => {
-    getUser();
-  }, []);
 
   useEffect(() => {
     getStorage()
@@ -238,9 +221,7 @@ const Monitor = () => {
           <br />
           <Card title={"Image Management"}>
             <Space size={"large"} wrap={true}>
-              <Button icon={<CloudUploadOutlined />} onClick={openUpload}>
-                {changeUpload(status)}
-              </Button>
+              <Upload />
               <Button icon={<ThunderboltOutlined />}>upload livephoto</Button>
               <Button icon={<TruckOutlined />}>export packs</Button>
               <NavLink to={'/monitor/image'}>
