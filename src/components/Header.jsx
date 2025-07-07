@@ -1,14 +1,16 @@
 // 顶部导航切换 直接嵌入到每个单独页面中使用
-import { Flex, Menu } from "antd";
-import { useState } from "react";
+import { Avatar, Flex, Menu, Space } from "antd";
+import { useContext, useState } from "react";
 import {
   BorderlessTableOutlined,
   GatewayOutlined,
   InsertRowBelowOutlined,
-  OneToOneOutlined,
+  OneToOneOutlined, UserOutlined
 } from "@ant-design/icons";
 import "./Header.css";
 import { NavLink, useNavigate } from "react-router";
+import UserContext from "./UserContext.jsx";
+import { getAvatarUrl } from "../util.js";
 
 const menuMap = {
   gallery: "/gallery",
@@ -24,7 +26,8 @@ const menuMap = {
 
 const Header = () => {
   const nav = useNavigate();
-  const [current, setCurrent] = useState("mail");
+  const [current, setCurrent] = useState("gallery");
+  const { user, privilege } = useContext(UserContext);
 
   const onClick = (e) => {
     setCurrent(e.key);
@@ -75,6 +78,22 @@ const Header = () => {
       ],
     },
   ];
+
+  const renderAvatar = () => {
+    if (user?.avatar && user?.name) {
+      return (
+        <NavLink to={'/monitor/user'}>
+          <Avatar
+            size={64}
+            src={getAvatarUrl(user.avatar)}
+            style={{ margin: "-0.75rem 0" }}
+          />
+        </NavLink>
+      )
+    }
+    // header中不展示访客头像
+    return null;
+  }
   return (
     <>
       <Flex justify="space-between" align={"center"} className={"header"}>
@@ -85,13 +104,16 @@ const Header = () => {
             <span style={{ color: "#fff" }}>◀</span>
           </span>
         </NavLink>
-        <Menu
-          className={"menu"}
-          onClick={onClick}
-          selectedKeys={[current]}
-          mode="horizontal"
-          items={items}
-        />
+        <Flex style={{ minWidth: 0, flex: 'auto', justifyContent: 'end' }} align={"center"}>
+          <Menu
+            className={"menu"}
+            onClick={onClick}
+            selectedKeys={[current]}
+            mode="horizontal"
+            items={items}
+          />
+          {renderAvatar()}
+        </Flex>
       </Flex>
     </>
   );

@@ -35,7 +35,7 @@ const User = () => {
   const [showReset, setShowReset] = useState(false);
   const [showUpload, setShowUpload] = useState(false);
 
-  const { user, privilege } = useContext(UserContext);
+  const { user, privilege, getUser } = useContext(UserContext);
 
   const renderPrivilege = (p) => {
     switch (p) {
@@ -59,10 +59,14 @@ const User = () => {
   const handleLogout = () => {
     // 强制退出
     clearPalaceCode();
-    apiLogout().then(() => {
-      toast("logout successfully.");
-      nav("/login");
-    });
+    apiLogout()
+      .then(() => {
+        toast("logout successfully.");
+        nav("/login");
+      })
+      .finally(() => {
+        getUser();
+      });
   };
 
   const reset = (e) => {

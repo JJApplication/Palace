@@ -1,8 +1,19 @@
 import Header from "./components/Header.jsx";
 import Footer from "./components/Footer.jsx";
-import { Avatar, Button, Card, Col, Flex, Progress, Row, Space, Statistic, Tag } from "antd";
+import {
+  Avatar,
+  Button,
+  Card,
+  Col,
+  Flex,
+  Progress,
+  Row,
+  Space,
+  Statistic,
+  Tag,
+} from "antd";
 import "./styles/Monitor.css";
-import {useContext, useEffect, useRef, useState} from "react";
+import { useContext, useEffect, useState } from "react";
 import { apiLogout } from "./api/login.js";
 import {
   InsertRowBelowOutlined,
@@ -18,7 +29,6 @@ import {
 } from "@ant-design/icons";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { apiUploadImages } from "./api/images.js";
 import { clearPalaceCode, getAvatarUrl, isAdmin } from "./util.js";
 import { apiStorage } from "./api/storage.js";
 import Upload from "./components/Upload.jsx";
@@ -26,36 +36,38 @@ import UserContext from "./components/UserContext.jsx";
 
 const Monitor = () => {
   const nav = useNavigate();
-  const ref = useRef();
-  const [status, setStatus] = useState(0); // 上传状态
   const [storage, setStorage] = useState({});
 
-  const { user, privilege } = useContext(UserContext);
+  const { user, privilege, getUser } = useContext(UserContext);
 
   const getStorage = () => {
     if (isAdmin(privilege)) {
-      apiStorage().then(res => {
+      apiStorage().then((res) => {
         res.json().then((data) => {
           setStorage(data.data);
-        })
-      })
+        });
+      });
     }
-  }
+  };
 
   useEffect(() => {
-    getStorage()
+    getStorage();
   }, [privilege]);
 
   const renderPercent = () => {
     if (!storage || storage?.max_space <= 0) {
-      return 0
+      return 0;
     }
-    const res = (Number(storage?.total_upload_size) + Number(storage?.total_thumbnail_size)) / Number(storage?.max_space)
+    const res =
+      (Number(storage?.total_upload_size) +
+        Number(storage?.total_thumbnail_size)) /
+      Number(storage?.max_space);
     if (res >= 1) {
-      return 100
+      return 100;
     }
     return Math.floor(res * 100);
-  }
+  };
+
   const renderPrivilege = (p) => {
     switch (p) {
       case 0: {
@@ -75,66 +87,16 @@ const Monitor = () => {
     }
   };
 
-  const changeUpload = (status) => {
-    switch (status) {
-      case 0: {
-        return "upload images";
-      }
-      case 1: {
-        return "uploading...";
-      }
-      case 2: {
-        return "done";
-      }
-      case 3: {
-        return "upload failed";
-      }
-      default: {
-        return "upload images";
-      }
-    }
-  };
-
   const handleLogout = () => {
     // 强制退出
     clearPalaceCode();
-    apiLogout().then(() => {
-      toast("logout successfully.");
-      nav("/login");
-    });
-  };
-
-  const openUpload = () => {
-    if (status === 1) {
-      return;
-    }
-    setStatus(0);
-    ref.current.click();
-  };
-
-  const startUpload = (e) => {
-    if (e.target.files && e.target.files.length <= 0) {
-      return;
-    }
-    setStatus(1);
-    const files = e.target.files;
-    const formData = new FormData();
-    for (let file of files) {
-      formData.append("files", file);
-    }
-    apiUploadImages(formData)
-      .then((res) => {
-        if (!res.ok) {
-          setStatus(3);
-          toast.error("upload failed");
-          return;
-        }
-        setStatus(2);
-        toast("upload success");
+    apiLogout()
+      .then(() => {
+        toast("logout successfully.");
+        nav("/login");
       })
-      .catch((e) => {
-        setStatus(3);
-        toast.error("upload failed" + e);
+      .finally(() => {
+        getUser();
       });
   };
 
@@ -149,12 +111,26 @@ const Monitor = () => {
               <Space size={"large"}>
                 {user?.name && user?.avatar ? (
                   <Avatar
-                    size={{ xs: 64, sm: 72, md: 96, lg: 128, xl: 196, xxl: 256 }}
+                    size={{
+                      xs: 64,
+                      sm: 72,
+                      md: 96,
+                      lg: 128,
+                      xl: 196,
+                      xxl: 256,
+                    }}
                     src={getAvatarUrl(user.avatar)}
                   />
                 ) : (
                   <Avatar
-                    size={{ xs: 64, sm: 72, md: 96, lg: 128, xl: 196, xxl: 256 }}
+                    size={{
+                      xs: 64,
+                      sm: 72,
+                      md: 96,
+                      lg: 128,
+                      xl: 196,
+                      xxl: 256,
+                    }}
                     style={{ backgroundColor: "#823e9c" }}
                     icon={<UserOutlined />}
                   />
@@ -186,55 +162,61 @@ const Monitor = () => {
             </Flex>
           </Card>
           <br />
-          {isAdmin(privilege) && <Card title={"Storage Detail"}>
-            <Row gutter={16}>
-              <Col span={24} style={{ marginBottom: "0.75rem" }}>
-                <p>Storage Usage</p>
-                <Progress
-                  type="dashboard"
-                  steps={8}
-                  percent={renderPercent()}
-                  trailColor="rgba(0, 0, 0, 0.25)"
-                  strokeWidth={20}
-                />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Total Photo" value={storage?.total_upload} />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Photo Size" value={storage?.total_upload_size} />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Total Thumb" value={storage?.total_thumbnail} />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Thumbnail Size" value={storage?.total_thumbnail_size} />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Max SpaceSize" value={storage?.max_space} />
-              </Col>
-              <Col span={12}>
-                <Statistic title="Database" value={storage?.db_size} />
-              </Col>
-            </Row>
-          </Card>}
+          {isAdmin(privilege) && (
+            <Card title={"Storage Detail"}>
+              <Row gutter={16}>
+                <Col span={24} style={{ marginBottom: "0.75rem" }}>
+                  <p>Storage Usage</p>
+                  <Progress
+                    type="dashboard"
+                    steps={8}
+                    percent={renderPercent()}
+                    trailColor="rgba(0, 0, 0, 0.25)"
+                    strokeWidth={20}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="Total Photo"
+                    value={storage?.total_upload}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="Photo Size"
+                    value={storage?.total_upload_size}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="Total Thumb"
+                    value={storage?.total_thumbnail}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic
+                    title="Thumbnail Size"
+                    value={storage?.total_thumbnail_size}
+                  />
+                </Col>
+                <Col span={12}>
+                  <Statistic title="Max SpaceSize" value={storage?.max_space} />
+                </Col>
+                <Col span={12}>
+                  <Statistic title="Database" value={storage?.db_size} />
+                </Col>
+              </Row>
+            </Card>
+          )}
           <br />
           <Card title={"Image Management"}>
             <Space size={"large"} wrap={true}>
               <Upload />
               <Button icon={<ThunderboltOutlined />}>upload livephoto</Button>
               <Button icon={<TruckOutlined />}>export packs</Button>
-              <NavLink to={'/monitor/image'}>
+              <NavLink to={"/monitor/image"}>
                 <Button icon={<RestOutlined />}>recycle</Button>
               </NavLink>
-              <input
-                ref={ref}
-                type="file"
-                onChange={(e) => startUpload(e)}
-                multiple
-                accept="image/*"
-                style={{ display: "none" }}
-              />
             </Space>
           </Card>
           <br />
