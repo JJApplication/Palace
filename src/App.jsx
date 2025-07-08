@@ -12,6 +12,7 @@ import UserContext from "./components/UserContext.jsx";
 function App() {
   const [user, setUser] = useState({}); // 用户信息包括用户名，头像，权限描述
   const [privilege, setPrivilege] = useState("guest");
+  const [currentMenu, setCurrentMenu] = useState("");
 
   const getUser = () => {
     // 简化请求，如果没有token不请求
@@ -36,7 +37,15 @@ function App() {
     getUser();
   }, []);
 
-  const value = { user, setUser, privilege, setPrivilege, getUser };
+  const value = {
+    user,
+    setUser,
+    privilege,
+    setPrivilege,
+    getUser,
+    currentMenu,
+    setCurrentMenu,
+  };
 
   return (
     <>

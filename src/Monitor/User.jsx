@@ -120,7 +120,6 @@ const User = () => {
       if (res.ok) {
         toast("头像上传成功");
         res.json().then((data) => {
-          console.log(data);
           setCurrentAvatar(data?.data);
         });
         return;

@@ -212,3 +212,29 @@ func (i *ImageController) AddCate(c *gin.Context) {
 
 	ctx.ResponseREST(200, response.JSON{})
 }
+
+func (i *ImageController) ModifyTags(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	var req request.ImageTags
+	if err := c.ShouldBindJSON(&req); err != nil {
+		log.Logger.ErrorF("bind json error: %s", err.Error())
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+	if req.UUID == "" {
+		ctx.ResponseREST(400, response.JSON{
+			Error: "uuid is null",
+		})
+		return
+	}
+	if err := service.ImageServiceApp.ModifyTags(req); err != nil {
+		ctx.ResponseREST(400, response.JSON{
+			Error: err.Error(),
+		})
+		return
+	}
+
+	ctx.ResponseREST(200, response.JSON{})
+}

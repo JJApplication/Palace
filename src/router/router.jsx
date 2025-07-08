@@ -13,6 +13,8 @@ import Album from "../Album.jsx";
 import AlbumDetail from "../AlbumDetail.jsx";
 import GalleryRecycle from "../GalleryRecycle.jsx";
 import Task from "../Monitor/Task.jsx";
+import TagPage from "../Tag.jsx";
+import TagDetail from "../TagDetail.jsx";
 
 const router = createBrowserRouter([
   {
@@ -37,7 +39,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/tag", // tag
-    Component: NotFound,
+    Component: TagPage,
+  },
+  {
+    path: "/tag/:name", // tag
+    Component: TagDetail,
   },
   {
     path: "/task", // task

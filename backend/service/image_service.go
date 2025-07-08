@@ -381,3 +381,50 @@ func (i *ImageService) AddCate(req request.ImageCate) error {
 	// 已经存在默认返回
 	return nil
 }
+
+func (i *ImageService) ModifyTags(req request.ImageTags) error {
+	// 仅加入存在的标签
+	var tags []model.Tag
+	for _, tag := range req.Tags {
+		var tmp model.Tag
+		if err := db.DB.Model(&model.Tag{}).Where("name=?", tag).First(&tmp).Error; err != nil {
+			log.Logger.ErrorF("find tag: %s error: %s", tag, err.Error())
+			continue
+		}
+		tags = append(tags, tmp)
+	}
+	if len(tags) == 0 {
+		return nil
+	}
+
+	tx := db.DB.Begin()
+	// 先清空uuid对应的所有tag然后更新
+	if err := tx.Model(&model.ImageTag{}).Where("uuid=?", req.UUID).Delete(&model.ImageTag{}).Error; err != nil {
+		log.Logger.ErrorF("delete tag error: %s", err.Error())
+		tx.Rollback()
+		return err
+	}
+	for _, tag := range tags {
+		var it model.ImageTag // 已经存在的标签跳过
+		if err := tx.Model(&model.ImageTag{}).Where("uuid=?", req.UUID).Where("tag=?", tag.ID).First(&it).Error; err != nil {
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				err := tx.Model(&model.ImageTag{}).Create(&model.ImageTag{
+					UUID:  req.UUID,
+					TagID: tag.ID,
+				}).Error
+				if err != nil {
+					log.Logger.ErrorF("add tag error: %s", err.Error())
+					tx.Rollback()
+					return err
+				}
+				continue
+			}
+			tx.Rollback()
+			log.Logger.ErrorF("update tag error: %s", err.Error())
+			return err
+		}
+	}
+
+	log.Logger.InfoF("update tags of %s success", req.UUID)
+	return tx.Commit().Error
+}

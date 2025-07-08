@@ -6,9 +6,10 @@ import "./styles/Blocked.css";
 import {
   StopOutlined,
 } from "@ant-design/icons";
-import { NavLink } from "react-router";
+import { NavLink, useNavigate } from "react-router";
 
 const Blocked = () => {
+  const nav = useNavigate();
   return (
       <>
         <Header />
@@ -20,7 +21,7 @@ const Blocked = () => {
               subTitle={'please login to Palace to access this page'}
               extra={
             <Space>
-              <NavLink to="/"><Button type={'primary'}>Back</Button></NavLink>
+              <Button type={'primary'} onClick={() => {nav(-1)}}>Back</Button>
               <NavLink to="/login"><Button type={'dashed'}>Login</Button></NavLink>
             </Space>}
           >

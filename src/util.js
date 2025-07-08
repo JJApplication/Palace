@@ -43,7 +43,6 @@ export function getDateTime(timestamp) {
     let str = timestamp.split("T");
     const date = str[0];
     str = str[1].split(".");
-    console.log(str[1]);
     const time = str[0]
     return time ? `${date} ${time}` : date;
   }

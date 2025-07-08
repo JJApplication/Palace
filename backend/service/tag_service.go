@@ -21,10 +21,11 @@ func (s *TagService) Add(tag response.TagRes) error {
 		return err
 	}
 	return db.DB.Model(&model.Tag{}).Create(&model.Tag{
-		Name:    tag.Name,
-		Like:    tag.Like,
-		TagDate: tag.TagDate,
-		TagInfo: tag.TagInfo,
+		Name:     tag.Name,
+		Like:     tag.Like,
+		TagDate:  tag.TagDate,
+		TagInfo:  tag.TagInfo,
+		TagColor: tag.TagColor,
 	}).Error
 }
 
@@ -34,10 +35,11 @@ func (s *TagService) Update(tag response.TagRes) error {
 		return err
 	}
 	updateMaps := map[string]any{
-		"name":     tag.Name,
-		"like":     tag.Like,
-		"tag_date": tag.TagDate,
-		"tag_info": tag.TagInfo,
+		"name":      tag.Name,
+		"like":      tag.Like,
+		"tag_date":  tag.TagDate,
+		"tag_info":  tag.TagInfo,
+		"tag_color": tag.TagColor,
 	}
 	// 如果更新了名称，无需更新关系表因为基于ID关联
 	return db.DB.Model(&model.Tag{}).Where("id=?", tag.ID).Updates(updateMaps).Error

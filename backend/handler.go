@@ -58,7 +58,7 @@ func Start() {
 		imageGroup.Handle(http.POST, "/hidden", CheckLogin, controller.ImageControllerApp.Hidden)           // 隐藏|取消隐藏图片
 		imageGroup.Handle(http.POST, "/modify", CheckLogin, controller.ImageControllerApp.Modify)           // 修改图片信息
 		imageGroup.Handle(http.POST, "/delete", CheckLogin, controller.ImageControllerApp.Delete)           // 删除图片
-		imageGroup.Handle(http.POST, "/tag/modify", CheckLogin, controller.ImageControllerApp.Upload)       // 编辑图片的标签
+		imageGroup.Handle(http.POST, "/tag/modify", CheckLogin, controller.ImageControllerApp.ModifyTags)   // 编辑图片的标签
 		imageGroup.Handle(http.POST, "/tag/delete", CheckLogin, controller.ImageControllerApp.Upload)       // 编辑图片的标签
 		imageGroup.Handle(http.POST, "/tag/add", CheckLogin, controller.ImageControllerApp.Upload)          // 编辑图片的标签
 		imageGroup.Handle(http.POST, "/cate/modify", CheckLogin, controller.ImageControllerApp.Upload)      // 编辑图片的分类相册

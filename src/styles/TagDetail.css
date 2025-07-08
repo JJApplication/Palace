@@ -1,0 +1,9 @@
+.tag-detail {
+    max-width: 1440px;
+    margin-top: 4rem;
+}
+
+.tag-detail .tag-info {
+    color: #6c6c6c;
+    margin: 0 auto;
+}

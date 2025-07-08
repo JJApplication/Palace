@@ -45,6 +45,9 @@ func CreateImageThumbnail(imagePath string, ext string) error {
 		dst = imaging.Resize(src, 600, 0, imaging.Linear)
 	} else if height > 800 {
 		dst = imaging.Resize(src, 0, 900, imaging.Linear)
+	} else {
+		// 以原图输出
+		dst = imaging.Resize(src, 400, 0, imaging.Linear)
 	}
 	switch ext {
 	case ".jpg", ".jpeg":

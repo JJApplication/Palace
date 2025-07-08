@@ -2,6 +2,7 @@
 import {
   Button,
   Card,
+  Collapse,
   Form,
   Input,
   Modal,
@@ -9,7 +10,8 @@ import {
   Popover,
   Select,
   Space,
-  Tag, Tooltip
+  Tag,
+  Tooltip,
 } from "antd";
 import { useEffect, useRef, useState } from "react";
 import { RowsPhotoAlbum } from "react-photo-album";
@@ -28,19 +30,22 @@ import {
   apiImageAddCate,
 } from "../api/images.js";
 import {
-  AppstoreAddOutlined, CloseOutlined,
+  AppstoreAddOutlined,
+  CloseOutlined,
   DeleteOutlined,
   EyeInvisibleOutlined,
   EyeOutlined,
   FlagOutlined,
-  InfoCircleOutlined, RollbackOutlined,
+  InfoCircleOutlined,
+  RollbackOutlined,
   SyncOutlined,
-  TagOutlined
+  TagOutlined,
 } from "@ant-design/icons";
 import { apiRecycleImage, apiRestoreImage } from "../api/recycle.js";
 import HiddenCover from "./HiddenCover.jsx";
 import SelectIcon from "./SelectIcon.jsx";
 import "./PhotoList.css";
+import { apiGetTagList, apiUpdateImageTags } from "../api/tag.js";
 
 const PhotoType = {
   gallery: "gallery",
@@ -71,7 +76,7 @@ const PhotoList = ({
   const [showDelReal, setShowDelReal] = useState(false);
 
   const [categories, setCategories] = useState([]); // 仅在首次加载，用于缓存，增加按钮刷新
-  const [tags, setTags] = useState([]);
+  const [tags, setTags] = useState([]); // 全部tags 仅在首次加载
 
   const [selectPhotos, setSelectPhotos] = useState([]);
   const [selectCount, setSelectCount] = useState(0);
@@ -79,6 +84,7 @@ const PhotoList = ({
   useEffect(() => {
     if (isAdmin(privilege)) {
       getAllCategories();
+      getAllTags();
     }
   }, [privilege]);
 
@@ -140,6 +146,24 @@ const PhotoList = ({
       }
     });
   };
+
+  const getAllTags = (showMessage) => {
+    apiGetTagList().then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          setTags(data.data);
+          if (showMessage) {
+            toast("标签获取成功");
+          }
+        });
+        return;
+      }
+      if (showMessage) {
+        toast.error("标签获取失败");
+      }
+    });
+  };
+
   const hideImage = (uuid, hidden) => {
     const data = { uuid: uuid, hide: hidden };
     const msg = hidden > 0 ? "隐藏" : "取消隐藏";
@@ -205,7 +229,7 @@ const PhotoList = ({
   };
 
   const recyclePhotoMult = () => {
-    const selectedList = selectPhotos.filter((p) => p.selected)
+    const selectedList = selectPhotos.filter((p) => p.selected);
     apiRecycleImage(selectedList.map((p) => p.uuid))
       .then((res) => {
         if (res.ok) {
@@ -218,16 +242,16 @@ const PhotoList = ({
       })
       .catch(() => {
         toast.error("delete failed", { position: "bottom-right" });
-      })
+      });
   };
 
   const clearSelected = () => {
-    const list = selectPhotos.filter((p) => p)
-    list.forEach((p) => p.selected = false);
+    const list = selectPhotos.filter((p) => p);
+    list.forEach((p) => (p.selected = false));
     setSelectPhotos(list);
-  }
+  };
   const restorePhotoMult = () => {
-    const selectedList = selectPhotos.filter((p) => p.selected)
+    const selectedList = selectPhotos.filter((p) => p.selected);
     apiRestoreImage(selectedList.map((p) => p.uuid))
       .then((res) => {
         if (res.ok) {
@@ -278,6 +302,26 @@ const PhotoList = ({
     setShowCate(false);
   };
 
+  const openImageTag = () => {
+    getPhotoInfo();
+    setShowTag(true);
+  };
+
+  const handleImageTagAdd = () => {
+    const data = { uuid: currentPhoto.uuid, tags: currentPhotoInfo.tags };
+    apiUpdateImageTags(data).then((res) => {
+      if (res.ok) {
+        toast("标签更新成功", { position: "bottom-right" });
+        return;
+      }
+      toast.error("标签更新失败", { position: "bottom-right" });
+    });
+  };
+
+  const handleImageTagClose = () => {
+    setShowTag(false);
+  };
+
   // 按钮分组
   const baseBtns = () => {
     return [
@@ -311,7 +355,7 @@ const PhotoList = ({
         key="tag-button"
         icon={<TagOutlined style={{ fontSize: "24px" }} />}
         className="yarl__button"
-        onClick={() => {}}
+        onClick={openImageTag}
       ></Button>,
     ];
   };
@@ -637,8 +681,97 @@ const PhotoList = ({
         open={showTag}
         title="Image Tags"
         destroyOnHidden={true}
-        onCancel={() => setShowInfo(false)}
-      ></Modal>
+        onCancel={handleImageTagClose}
+        onOk={handleImageTagAdd}
+        getContainer={() => {
+          const root = document.getElementsByClassName("yarl__root")[0];
+          return root ? root : document.body;
+        }}
+        style={{ zIndex: 9999 }}
+      >
+        <Form labelCol={{ span: 4 }} initialValues={currentPhoto}>
+          <Form.Item label="name" name="name">
+            <Input disabled={true} />
+          </Form.Item>
+          <Form.Item label="uuid" name="uuid">
+            <Input disabled={true} />
+          </Form.Item>
+          <Form.Item label="image tags">
+            {(currentPhotoInfo?.tags || []).map((tag) => (
+              <Tag
+                key={tag}
+                style={{ cursor: "pointer", userSelect: "none" }}
+                closable={isAdmin(privilege)}
+                onClose={() => {
+                  const originTags = currentPhotoInfo?.tags || [];
+                  if (!originTags.find((t) => t === tag)) {
+                    return;
+                  }
+                  const targetTags = originTags.filter((t) => t !== tag);
+                  setCurrentPhotoInfo({
+                    ...currentPhotoInfo,
+                    tags: targetTags,
+                  });
+                }}
+              >
+                {tag}
+              </Tag>
+            ))}
+          </Form.Item>
+          <Form.Item
+            label={
+              <Space size={"small"}>
+                <span>tags</span>
+                <Button
+                  icon={<SyncOutlined />}
+                  shape="circle"
+                  type="primary"
+                  size="small"
+                  onClick={() => getAllTags(true)}
+                />
+              </Space>
+            }
+          >
+            <Collapse
+              size="small"
+              items={[
+                {
+                  key: "1",
+                  label: "Select tags to add",
+                  children: (
+                    <Space
+                      size={"small"}
+                      wrap={true}
+                      style={{ maxHeight: "200px", overflow: "auto" }}
+                    >
+                      {tags.map((tag) => (
+                        <Tag
+                          key={tag.name}
+                          color={tag.tag_color}
+                          style={{ cursor: "pointer", userSelect: "none" }}
+                          onClick={() => {
+                            const originTags = currentPhotoInfo?.tags || [];
+                            if (originTags.find((t) => t === tag.name)) {
+                              return;
+                            }
+                            originTags.push(tag.name);
+                            setCurrentPhotoInfo({
+                              ...currentPhotoInfo,
+                              tags: originTags,
+                            });
+                          }}
+                        >
+                          {tag.name}
+                        </Tag>
+                      ))}
+                    </Space>
+                  ),
+                },
+              ]}
+            />
+          </Form.Item>
+        </Form>
+      </Modal>
       <Modal
         open={showDel}
         title="Delete Image"
@@ -684,19 +817,36 @@ const PhotoList = ({
       {photoType === PhotoType.recycle && selectCount > 0 && (
         <div className={"float-select"}>
           <Card className={"float-select-card"}>
-            <Space size={'large'}>
-              <Space size={'small'}>
+            <Space size={"large"}>
+              <Space size={"small"}>
                 <Tag color={"blue"}>Photo Select</Tag>
                 <span style={{ fontSize: "1.25rem" }}>{selectCount}</span>
               </Space>
-              <Tooltip title='恢复图片'>
-                <Button icon={<RollbackOutlined />} shape={'circle'} type={'primary'} onClick={restorePhotoMult}></Button>
+              <Tooltip title="恢复图片">
+                <Button
+                  icon={<RollbackOutlined />}
+                  shape={"circle"}
+                  type={"primary"}
+                  onClick={restorePhotoMult}
+                ></Button>
               </Tooltip>
-              <Tooltip title='删除图片'>
-                <Button icon={<DeleteOutlined />} shape={'circle'} danger type={'primary'} onClick={recyclePhotoMult}></Button>
+              <Tooltip title="删除图片">
+                <Button
+                  icon={<DeleteOutlined />}
+                  shape={"circle"}
+                  danger
+                  type={"primary"}
+                  onClick={recyclePhotoMult}
+                ></Button>
               </Tooltip>
-              <Tooltip title='清空选择'>
-                <Button icon={<CloseOutlined />} shape={'circle'} variant="solid" color={'orange'} onClick={clearSelected}></Button>
+              <Tooltip title="清空选择">
+                <Button
+                  icon={<CloseOutlined />}
+                  shape={"circle"}
+                  variant="solid"
+                  color={"orange"}
+                  onClick={clearSelected}
+                ></Button>
               </Tooltip>
             </Space>
           </Card>

@@ -222,7 +222,6 @@ const Upload = ({ title = "Upload", album, onOk, onBad }) => {
         onOk={() => {
           onOk();
         }}
-        destroyOnClose={true}
         destroyOnHidden={true}
         maskClosable={false}
         footer={null}

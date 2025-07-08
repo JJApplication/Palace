@@ -12,12 +12,15 @@ import { PhotoList, PhotoType } from "./components/PhotoList.jsx";
 import "./styles/Gallery.css";
 import { getImageUrl } from "./util.js";
 import UserContext from "./components/UserContext.jsx";
+import { FloatButton } from "antd";
+import { ArrowUpOutlined } from "@ant-design/icons";
 
 const Gallery = () => {
   const nav = useNavigate();
   const [photos, setPhotos] = useState([]);
   const [init, setInit] = useState(false);
   const [initCode, setInitCode] = useState("#");
+  const [scroll, setScroll] = useState(false);
 
   const { privilege } = useContext(UserContext);
 
@@ -27,6 +30,28 @@ const Gallery = () => {
     getPhotos();
     initCallback(initCode);
     return () => clearInterval(tick);
+  }, []);
+
+  const handleScroll = () => {
+    if (window.scrollY > window.innerHeight) {
+      setScroll(true);
+    } else {
+      setScroll(false);
+    }
+  };
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
+
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
   }, []);
 
   const backHome = () => {
@@ -83,6 +108,13 @@ const Gallery = () => {
     <div
       style={{ textAlign: "center", display: "flex", justifyContent: "center" }}
     >
+      {scroll && (
+        <FloatButton
+          icon={<ArrowUpOutlined />}
+          onClick={scrollToTop}
+          style={{ width: "56px", height: "56px" }}
+        />
+      )}
       {!init && (
         <div
           style={{
