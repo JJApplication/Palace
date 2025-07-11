@@ -2,13 +2,19 @@ package service
 
 import (
 	"errors"
-	"gorm.io/gorm"
+	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
+	"time"
+
+	"github.com/JJApplication/fushin/utils/files"
+	"gorm.io/gorm"
+	"palace/config"
 	"palace/db"
 	"palace/log"
 	"palace/model"
 	"palace/utils"
-	"time"
 )
 
 // TaskService task服务 用于创建后台运行的异步任务
@@ -97,7 +103,62 @@ func (s *TaskService) RemoveImagePosition() error {
 	return nil
 }
 
-func (s *TaskService) PackageImages() {}
+// PackageImageVersion 获取当前打包的版本号
+func (s *TaskService) PackageImageVersion() string {
+	packages, err := os.ReadDir(config.PackagePath)
+	if err != nil {
+		log.Logger.ErrorF("scan package-path failed: %s", err.Error())
+		return ""
+	}
+	var vers []string
+	for _, pkg := range packages {
+		if pkg.IsDir() {
+			continue
+		}
+		vers = append(vers, pkg.Name())
+	}
+	if len(vers) == 0 {
+		return ""
+	}
+	return vers[0]
+}
+
+// PackageImages 生成新的打包, 会自动删除旧的打包
+func (s *TaskService) PackageImages() error {
+	packages, err := os.ReadDir(config.PackagePath)
+	if err != nil {
+		log.Logger.ErrorF("scan package-path failed: %s", err.Error())
+		return err
+	}
+	for _, pkg := range packages {
+		if err := os.RemoveAll(filepath.Join(config.PackagePath, pkg.Name())); err != nil {
+			log.Logger.ErrorF("remove package failed: %s", err.Error())
+			return err
+		}
+	}
+	// 开始打包
+	task, err := s.createTask("PACKAGE_IMAGES")
+	if err != nil {
+		return err
+	}
+	if err := db.DB.Model(&model.Task{}).Create(task).Error; err != nil {
+		return err
+	}
+	go func(taskID string) {
+		if err := s.archiveImages(); err != nil {
+			s.failTask(taskID, err.Error())
+			return
+		}
+		s.completeTask(taskID)
+	}(task.TaskID)
+	return nil
+}
+
+func (s *TaskService) archiveImages() error {
+	src := config.UploadPath
+	dst := filepath.Join(config.PackagePath, fmt.Sprintf("pack-%s.zip", time.Now().Format(time.DateOnly)))
+	return files.Zip(src, dst)
+}
 
 func (s *TaskService) ForceSyncImageLike() {}
 

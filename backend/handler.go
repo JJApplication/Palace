@@ -44,6 +44,7 @@ func Start() {
 		fileGroup.GET("/image/:path", AccessHidden, controller.StaticControllerApp.FileImage)
 		fileGroup.GET("/thumbnail/:path", AccessHidden, controller.StaticControllerApp.FileThumbnail)
 		fileGroup.GET("/avatar/:path", controller.StaticControllerApp.FileAvatar)
+		fileGroup.GET("/pack", CheckLogin, controller.StaticControllerApp.Package)
 	}
 	// 按逻辑分组
 	imageGroup := server.Group("/api/image")
@@ -94,14 +95,15 @@ func Start() {
 	// 不再处理重命名和格式转换任务，默认自动转换为jpg
 	taskGroup := server.Group("/api/task")
 	{
-		taskGroup.Handle(http.GET, "/list", CheckLogin, controller.TaskControllerApp.List)                 // 任务列表
-		taskGroup.Handle(http.POST, "/clear/task", CheckLogin, controller.TaskControllerApp.ClearTasks)    // 清理任务
-		taskGroup.Handle(http.POST, "/clear/image", CheckLogin, controller.TaskControllerApp.ClearImages)  // 清理不存在的图片
-		taskGroup.Handle(http.POST, "/removepos", CheckLogin, controller.TaskControllerApp.RemovePosition) // 删除图片的位置信息
-		taskGroup.Handle(http.POST, "/package", CheckLogin, controller.TaskControllerApp.PackageImage)     // 打包图片
-		taskGroup.Handle(http.POST, "/sync/hide", CheckLogin, controller.TaskControllerApp.SyncHidden)     // 同步隐藏的图片
-		taskGroup.Handle(http.POST, "/sync/image", CheckLogin, controller.TaskControllerApp.SyncImageLike) // 同步图片的赞
-		taskGroup.Handle(http.POST, "/sync/album", CheckLogin, controller.TaskControllerApp.SyncAlbumLike) // 同步相册的赞
+		taskGroup.Handle(http.GET, "/list", CheckLogin, controller.TaskControllerApp.List)                   // 任务列表
+		taskGroup.Handle(http.POST, "/clear/task", CheckLogin, controller.TaskControllerApp.ClearTasks)      // 清理任务
+		taskGroup.Handle(http.POST, "/clear/image", CheckLogin, controller.TaskControllerApp.ClearImages)    // 清理不存在的图片
+		taskGroup.Handle(http.POST, "/removepos", CheckLogin, controller.TaskControllerApp.RemovePosition)   // 删除图片的位置信息
+		taskGroup.Handle(http.GET, "/package", CheckLogin, controller.TaskControllerApp.PackageImageVersion) // 获取打包图片版本
+		taskGroup.Handle(http.POST, "/package", CheckLogin, controller.TaskControllerApp.PackageImage)       // 打包图片
+		taskGroup.Handle(http.POST, "/sync/hide", CheckLogin, controller.TaskControllerApp.SyncHidden)       // 同步隐藏的图片
+		taskGroup.Handle(http.POST, "/sync/image", CheckLogin, controller.TaskControllerApp.SyncImageLike)   // 同步图片的赞
+		taskGroup.Handle(http.POST, "/sync/album", CheckLogin, controller.TaskControllerApp.SyncAlbumLike)   // 同步相册的赞
 	}
 	userGroup := server.Group("/api/user")
 	{

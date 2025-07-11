@@ -6,6 +6,7 @@ import {
   Card,
   Col,
   Flex,
+  Modal,
   Progress,
   Row,
   Space,
@@ -16,6 +17,7 @@ import "./styles/Monitor.css";
 import { useContext, useEffect, useState } from "react";
 import { apiLogout } from "./api/login.js";
 import {
+  DownloadOutlined,
   InsertRowBelowOutlined,
   LoginOutlined,
   LogoutOutlined,
@@ -23,23 +25,30 @@ import {
   PartitionOutlined,
   PictureOutlined,
   RestOutlined,
-  ThunderboltOutlined,
   TruckOutlined,
   UserOutlined,
 } from "@ant-design/icons";
 import { NavLink, useNavigate } from "react-router";
 import { toast } from "react-toastify";
-import { clearPalaceCode, getAvatarUrl, isAdmin } from "./util.js";
+import {
+  clearPalaceCode,
+  getAvatarUrl,
+  getPalaceCode,
+  isAdmin,
+} from "./util.js";
 import { apiStorage } from "./api/storage.js";
 import Upload from "./components/Upload.jsx";
 import UserContext from "./components/UserContext.jsx";
 import UploadLive from "./components/UploadLive.jsx";
+import { apiPackageVersion } from "./api/task.js";
 
 const Monitor = () => {
   const nav = useNavigate();
   const [storage, setStorage] = useState({});
 
   const { user, privilege, getUser } = useContext(UserContext);
+  const [showPack, setShowPack] = useState(false);
+  const [packVersion, setPackVersion] = useState("");
 
   const getStorage = () => {
     if (isAdmin(privilege)) {
@@ -99,6 +108,30 @@ const Monitor = () => {
       .finally(() => {
         getUser();
       });
+  };
+
+  const handleOpenPackImages = () => {
+    apiPackageVersion()
+      .then((res) => {
+        if (res.ok) {
+          res.json().then((data) => {
+            setPackVersion(data.data);
+            setShowPack(true);
+          });
+          return;
+        }
+        toast.error("获取包版本失败");
+      })
+      .catch(() => {
+        toast.error("获取包版本失败");
+      });
+  };
+
+  const handleDownloadPack = () => {
+    window.open(
+      `/static/pack?palaceCode=${encodeURIComponent(getPalaceCode())}`,
+      "_blank",
+    );
   };
 
   return (
@@ -214,9 +247,11 @@ const Monitor = () => {
             <Space size={"large"} wrap={true}>
               <Upload />
               <UploadLive />
-              <Button icon={<TruckOutlined />}>export packs</Button>
+              <Button icon={<TruckOutlined />} onClick={handleOpenPackImages}>
+                Export packs
+              </Button>
               <NavLink to={"/monitor/image"}>
-                <Button icon={<RestOutlined />}>recycle</Button>
+                <Button icon={<RestOutlined />}>Recycle</Button>
               </NavLink>
             </Space>
           </Card>
@@ -242,6 +277,31 @@ const Monitor = () => {
           </Card>
         </Card>
       </main>
+      <Modal
+        open={showPack}
+        destroyOnHidden={true}
+        title="PackImages Export"
+        onCancel={() => setShowPack(false)}
+        footer={null}
+      >
+        <Space>
+          <span>version:</span>
+          {packVersion ? (
+            <>
+              <Tag color="blue">{packVersion}</Tag>
+              <Button
+                icon={<DownloadOutlined />}
+                size={"small"}
+                onClick={handleDownloadPack}
+              >
+                Download
+              </Button>
+            </>
+          ) : (
+            <Tag color="orange">NONE</Tag>
+          )}
+        </Space>
+      </Modal>
       <Footer />
     </>
   );

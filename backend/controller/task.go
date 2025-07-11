@@ -60,7 +60,18 @@ func (t *TaskController) SyncAlbumLike(c *gin.Context) {
 	ctx.ResponseREST(200, response.JSON{})
 }
 
+// PackageImageVersion 获取当前打包版本，只能存在一个版本
+func (t *TaskController) PackageImageVersion(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	version := service.TaskServiceApp.PackageImageVersion()
+	ctx.ResponseREST(200, response.JSON{Data: version})
+}
+
 func (t *TaskController) PackageImage(c *gin.Context) {
 	ctx := http.Context{Context: c}
+	if err := service.TaskServiceApp.PackageImages(); err != nil {
+		ctx.ResponseREST(400, response.JSON{})
+		return
+	}
 	ctx.ResponseREST(200, response.JSON{})
 }

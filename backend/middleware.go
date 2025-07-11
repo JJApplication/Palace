@@ -36,12 +36,12 @@ func AccessHidden(c *gin.Context) {
 // CheckLogin 前置校验中间件，权限对应编辑者，允许删除图片到回收站
 // 在图片和相册隐藏场景下无法获取到token所以需要使用cookie验证
 func CheckLogin(c *gin.Context) {
-	code := c.Query("palaceCode")
-	if code == "" {
+	queryCode := c.Query("palaceCode")
+	if queryCode == "" {
 		log.Logger.Info("palaceCode query-code is empty")
 	}
-	code = c.GetHeader("token")
-	if code == "" {
+	tokenCode := c.GetHeader("token")
+	if queryCode == "" && tokenCode == "" {
 		log.Logger.Info("palaceCode token-code is empty")
 		c.AbortWithStatus(403)
 		return
@@ -49,11 +49,13 @@ func CheckLogin(c *gin.Context) {
 
 	// 旧的认证机制
 	var valid bool
-	if code == config.PalaceCode {
+	if queryCode == config.PalaceCode {
 		c.Next()
 		return
 	}
-	if service.UserServiceApp.CheckUser(code) {
+	if queryCode != "" && service.UserServiceApp.CheckUser(queryCode) {
+		valid = true
+	} else if tokenCode != "" && service.UserServiceApp.CheckUser(tokenCode) {
 		valid = true
 	}
 

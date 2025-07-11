@@ -31,6 +31,7 @@ var (
 	AESKey          string
 	CookieDomain    string
 	MaxSpace        int
+	PackagePath     string
 )
 
 const (
@@ -54,6 +55,7 @@ const (
 	DefaultThumbnail     = "/thumbnails"
 	DefaultNoAccessPhoto = "no-access.jpg"
 	DefaultMaxSpaceSize  = 1024 * 1024 * 1024 * 5
+	DefaultPackagePath   = "package"
 )
 
 func InitConfig() {
@@ -75,4 +77,5 @@ func InitConfig() {
 	AESKey = loader.Get("AESKey").MustString(DefaultAESKey)
 	CookieDomain = loader.Get("CookieDomain").MustString(DefaultCookieDomain)
 	MaxSpace = loader.Get("MaxSpace").MustInt(DefaultMaxSpaceSize)
+	PackagePath = loader.Get("PackagePath").MustString(DefaultPackagePath)
 }

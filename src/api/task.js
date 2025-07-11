@@ -44,6 +44,17 @@ const apiRemovePosition = () => {
   });
 };
 
+const apiPackageVersion = () => {
+  return fetch(fmtUrl("/api/task/package"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "get",
+    mode: "cors",
+    cache: "no-cache",
+  });
+};
+
 const apiPackageImages = () => {
   return fetch(fmtUrl("/api/task/package"), {
     headers: {
@@ -91,6 +102,7 @@ const apiSyncAlbumLike = () => {
 export {
   apiQueryTasks,
   apiPackageImages,
+  apiPackageVersion,
   apiRemovePosition,
   apiClearImages,
   apiClearTasks,

@@ -2,6 +2,7 @@ package utils
 
 import (
 	"os"
+
 	"palace/config"
 )
 
@@ -19,5 +20,9 @@ func InitDirs() {
 	_, err = os.Stat(config.AvatarPath)
 	if err != nil && os.IsNotExist(err) {
 		_ = os.Mkdir(config.AvatarPath, os.ModePerm)
+	}
+	_, err = os.Stat(config.PackagePath)
+	if err != nil && os.IsNotExist(err) {
+		_ = os.Mkdir(config.PackagePath, os.ModePerm)
 	}
 }
