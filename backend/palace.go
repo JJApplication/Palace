@@ -12,6 +12,7 @@ import (
 	"palace/db"
 	"palace/log"
 	"palace/service"
+	"palace/service/like"
 	"palace/task"
 	"palace/utils"
 )
@@ -24,5 +25,6 @@ func main() {
 	service.InitService()
 	service.InitHiddenImages()
 	utils.InitDirs()
+	like.InitPool()
 	Start()
 }

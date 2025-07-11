@@ -7,6 +7,7 @@ import (
 	"palace/model/request"
 	"palace/model/response"
 	"palace/service"
+	"palace/service/like"
 )
 
 type ImageController struct{}
@@ -61,6 +62,17 @@ func (i *ImageController) Info(c *gin.Context) {
 	ctx.ResponseREST(200, response.JSON{
 		Data: result,
 	})
+}
+
+func (*ImageController) Like(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	uuid := c.Query("uuid")
+	if uuid == "" {
+		ctx.ResponseREST(400, "uuid is null")
+		return
+	}
+	like.PhotoLike.Add(uuid)
+	ctx.ResponseREST(200, response.JSON{})
 }
 
 func (i *ImageController) Storage(c *gin.Context) {

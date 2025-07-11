@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"palace/model/response"
 	"palace/service"
+	"palace/service/like"
 )
 
 type TaskController struct{}
@@ -48,11 +49,15 @@ func (t *TaskController) SyncHidden(c *gin.Context) {
 }
 
 func (t *TaskController) SyncImageLike(c *gin.Context) {
-
+	like.PhotoLike.Sync()
+	ctx := http.Context{Context: c}
+	ctx.ResponseREST(200, response.JSON{})
 }
 
 func (t *TaskController) SyncAlbumLike(c *gin.Context) {
-
+	like.AlbumLike.Sync()
+	ctx := http.Context{Context: c}
+	ctx.ResponseREST(200, response.JSON{})
 }
 
 func (t *TaskController) PackageImage(c *gin.Context) {

@@ -6,6 +6,7 @@ import (
 	"palace/model/request"
 	"palace/model/response"
 	"palace/service"
+	"palace/service/like"
 )
 
 type CategoryController struct{}
@@ -119,4 +120,15 @@ func (cate *CategoryController) GetImages(c *gin.Context) {
 	}
 	result := service.CategoryServiceApp.GetCateImages(name)
 	ctx.ResponseREST(200, response.JSON{Data: result})
+}
+
+func (cate *CategoryController) Like(c *gin.Context) {
+	ctx := http.Context{Context: c}
+	id := c.Query("cate")
+	if id == "" {
+		ctx.ResponseREST(400, response.JSON{Error: "cate is null"})
+		return
+	}
+	like.AlbumLike.Add(id)
+	ctx.ResponseREST(200, response.JSON{})
 }

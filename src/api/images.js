@@ -76,4 +76,15 @@ const apiImageAddCate = (data) => {
   })
 }
 
-export { apiGetImageList, apiGetImageInfo, apiGetImageCount, apiHideImage, apiUploadImages, apiDeleteImage, apiImageAddCate };
+const apiLikeImage = (data) => {
+  return fetch(fmtUrl("/api/image/like"), {
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+    body: JSON.stringify(data),
+  })
+}
+export { apiGetImageList, apiGetImageInfo, apiGetImageCount, apiHideImage, apiUploadImages, apiDeleteImage, apiImageAddCate, apiLikeImage };

@@ -51,6 +51,7 @@ func Start() {
 		imageGroup.Handle(http.GET, "/count", controller.ImageControllerApp.Count)                          // 图片总数
 		imageGroup.Handle(http.GET, "/list", controller.ImageControllerApp.List)                            // 图片列表
 		imageGroup.Handle(http.GET, "/info", controller.ImageControllerApp.Info)                            // 图片信息
+		imageGroup.Handle(http.POST, "/like", controller.ImageControllerApp.Like)                           // 点赞
 		imageGroup.Handle(http.POST, "/upload", CheckLogin, controller.ImageControllerApp.Upload)           // 上传图片
 		imageGroup.Handle(http.GET, "/recycle", CheckLogin, controller.ImageControllerApp.RecycleList)      // 获取回收站图片列表
 		imageGroup.Handle(http.POST, "/recycle/delete", CheckLogin, controller.ImageControllerApp.Recycle)  // 删除回收站图片列表
@@ -82,6 +83,7 @@ func Start() {
 		albumGroup.Handle(http.GET, "/list", controller.CategoryControllerApp.List)                  // 查询相册列表 (返回相册下的图片数)
 		albumGroup.Handle(http.GET, "/info", controller.CategoryControllerApp.Get)                   // 查询相册详情
 		albumGroup.Handle(http.GET, "/images", controller.CategoryControllerApp.GetImages)           // 查询相册下的图片列表
+		albumGroup.Handle(http.POST, "/like", controller.CategoryControllerApp.Like)                 // 点赞
 		albumGroup.Handle(http.POST, "/add", CheckLogin, controller.CategoryControllerApp.Add)       // 新增相册
 		albumGroup.Handle(http.POST, "/update", CheckLogin, controller.CategoryControllerApp.Update) // 更新相册
 		albumGroup.Handle(http.POST, "/cover", CheckLogin, controller.CategoryControllerApp.Cover)   // 设置相册封面

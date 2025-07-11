@@ -20,8 +20,8 @@ import {
   apiAddAlbum,
   apiDeleteAlbum,
   apiGetAlbums,
-  apiHideAlbum,
-  apiUpdateAlbum,
+  apiHideAlbum, apiLikeAlbum,
+  apiUpdateAlbum
 } from "./api/album.js";
 import { toast } from "react-toastify";
 import "./styles/Album.css";
@@ -31,9 +31,25 @@ import {
   PlusSquareOutlined,
 } from "@ant-design/icons";
 import { NavLink } from "react-router";
+import debounce from "lodash/debounce";
+import cloneDeep from "lodash/cloneDeep";
+
 import { formatImageUrl, isAdmin, noCover } from "./util.js";
 import HiddenCover from "./components/HiddenCover.jsx";
 import UserContext from "./components/UserContext.jsx";
+
+const like = (id) => {
+  if (!id) return;
+  const params = {cate: id}
+  apiLikeAlbum(params).then((res) => {
+    if (res.ok) {
+      toast("点赞成功");
+      return
+    }
+    toast.error('点赞失败')
+  })
+};
+const debounceLike = debounce(like, 1500, { leading: true });
 
 const Album = () => {
   const [form] = Form.useForm();
@@ -45,6 +61,7 @@ const Album = () => {
   const [editAlbumInfo, setEditAlbumInfo] = useState({});
   const [showAddAlbum, setShowAddAlbum] = useState(false);
   const [showEditAlbum, setShowEditAlbum] = useState(false);
+  const [albumLike, setAlbumLike] = useState({}); // 保持键值对
 
   const { privilege } = useContext(UserContext);
 
@@ -68,6 +85,12 @@ const Album = () => {
   useEffect(() => {
     getAlbums();
   }, []);
+
+  const handleLikeAlbum = (id) => {
+    const data = cloneDeep(albumLike);
+    setAlbumLike(Object.assign(data, {[id]: true}));
+    debounceLike(id);
+  };
 
   const handleAddAlbum = async () => {
     try {
@@ -337,7 +360,11 @@ const Album = () => {
                         <Tag>
                           <PictureOutlined /> 图片: {item.image_count}
                         </Tag>
-                        <Tag>
+                        <Tag
+                          onClick={() => handleLikeAlbum(item.id)}
+                          style={{ userSelect: "none", cursor: "pointer" }}
+                          color={albumLike[item.id] ? 'blue' : null}
+                        >
                           <LikeOutlined /> 点赞: {item.like}
                         </Tag>
                       </Space>

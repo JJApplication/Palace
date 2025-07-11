@@ -33,6 +33,7 @@ import { clearPalaceCode, getAvatarUrl, isAdmin } from "./util.js";
 import { apiStorage } from "./api/storage.js";
 import Upload from "./components/Upload.jsx";
 import UserContext from "./components/UserContext.jsx";
+import UploadLive from "./components/UploadLive.jsx";
 
 const Monitor = () => {
   const nav = useNavigate();
@@ -212,7 +213,7 @@ const Monitor = () => {
           <Card title={"Image Management"}>
             <Space size={"large"} wrap={true}>
               <Upload />
-              <Button icon={<ThunderboltOutlined />}>upload livephoto</Button>
+              <UploadLive />
               <Button icon={<TruckOutlined />}>export packs</Button>
               <NavLink to={"/monitor/image"}>
                 <Button icon={<RestOutlined />}>recycle</Button>

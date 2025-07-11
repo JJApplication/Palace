@@ -84,4 +84,15 @@ const apiHideAlbum = (data) => {
   });
 };
 
-export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiSetAlbumCover, apiAddAlbum,apiUpdateAlbum, apiDeleteAlbum, apiHideAlbum };
+const apiLikeAlbum = (params) => {
+  return fetch(withQuery(fmtUrl("/api/album/like"), params) ,{
+    headers: {
+      token: getPalaceCode(),
+    },
+    method: "post",
+    mode: "cors",
+    cache: "no-cache",
+  });
+}
+
+export { apiGetAlbums, apiGetAlbumImageList, apiGetAlbumInfo, apiSetAlbumCover, apiAddAlbum,apiUpdateAlbum, apiDeleteAlbum, apiHideAlbum, apiLikeAlbum };
